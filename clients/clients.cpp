@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   clients.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
+/*   By: shehanihansika <shehanihansika@student.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/03 14:29:32 by shkaruna          #+#    #+#             */
-/*   Updated: 2025/08/03 16:42:47 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/08/04 16:35:32 by shehanihans      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ Client::Client(const std::string& ip, int port)
 		return;
 	}
 	_serverAddr.sin_family = AF_INET;
-	_serverAddr.sin_port = htons(port);
+	_serverAddr.sin_port = htons(port); //Host TO Network Short
 
 	int result = inet_pton(AF_INET, ip.c_str(), &_serverAddr.sin_addr);
 	if(result <= 0)
@@ -33,6 +33,13 @@ Client::Client(const std::string& ip, int port)
 		_sock = -1;
 		return;
 	}
+	if (connect(_sock, (struct sockaddr*)&_serverAddr, sizeof(_serverAddr)) < 0) {
+		std::cerr << "Error: Connection to server failed." << std::endl;
+		close(_sock);
+		_sock = -1;
+		return;
+	}
+
 	std::cout << "Client created successfully" << std::endl;
 }
 
@@ -40,5 +47,20 @@ Client::~Client()
 {
 	if (_sock != -1) {
 		close(_sock);
+	}
+}
+
+void Client::sendMessage(const std::string& msg)
+{
+	if (_sock == -1) {
+		std::cerr << "Cannot send message: No active connection." << std::endl;
+		return;
+	}
+
+	ssize_t sent = send(_sock, msg.c_str(), msg.length(), 0);
+	if (sent < 0) {
+		perror("send");
+	} else {
+		std::cout << "Sent message: " << msg << std::endl;
 	}
 }

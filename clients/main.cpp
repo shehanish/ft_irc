@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
+/*   By: shehanihansika <shehanihansika@student.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/03 14:21:28 by shkaruna          #+#    #+#             */
-/*   Updated: 2025/08/03 16:37:02 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/08/04 16:35:53 by shehanihans      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,12 @@
 //prepare the server address
 //So far no actual connetion happen unless you also call connect()
 
-int main() {
-    Client client("127.0.0.1", 6667); 
-    return 0;
+#include "clients.hpp"
+
+int main() 
+{
+	Client client("127.0.0.1", 6667); // Connect to local server on port 6667
+	client.sendMessage("NICK mynickname\r\n"); // IRC-style NICK command
+	return 0;
 }
+

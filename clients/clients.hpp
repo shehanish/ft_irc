@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   clients.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
+/*   By: shehanihansika <shehanihansika@student.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/03 14:29:29 by shkaruna          #+#    #+#             */
-/*   Updated: 2025/08/03 15:31:37 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/08/04 16:35:03 by shehanihans      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ class Client
 	public:
 		Client(const std::string& ip, int port);
 		~Client();
+
+		void sendMessage(const std::string& msg);
 
 	
 };

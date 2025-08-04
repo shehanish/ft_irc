@@ -1,6 +1,7 @@
-NAME = irc
 
-SRC = clients/main.cpp clients/clients.cpp 
+NAME = server
+
+SRC = server.cpp 
 
 OBJ = $(SRC:.CPP=.o)
 
@@ -22,6 +23,3 @@ fclean: clean
 re: fclean all
 
 .PHONY: all clean fclean re
-
-
-
