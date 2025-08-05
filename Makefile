@@ -1,22 +1,37 @@
+# ========== Compiler and Flags ==========
 NAME = ircserv
 
-SRC = clients/clients.cpp \
-	srcs/Server.cpp \
+CXX = c++
+
+CXXFLAGS = -Wall -Werror -Wextra -std=c++98 -Iincludes
+
+# ========== Directories ==========
+SRC_DIR     = srcs
+CLIENTS_DIR = clients
+OBJ_DIR     = objs
+INC_DIR     = includes
+
+# ========== Source Files ==========
+SRC = $(CLIENTS_DIR)/clients.cpp \
+	$(SRC_DIR)/Server.cpp \
 	main.cpp
 
-OBJ = $(SRC:.CPP=.o)
+# ========== Object Files ==========
+OBJ         = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 
-C++ = c++
-
-C++FLAGS = -Wall -Werror -Wextra -std=c++98
-
-$(NAME): $(OBJ)
-	$(C++) $(C++FLAGS) -o $(NAME) $(OBJ)
-
+# ========== Rules ==========
 all: $(NAME)
 
+$(NAME): $(OBJ)
+	@mkdir -p $(dir $(OBJ))
+	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJ)
+
+$(OBJ_DIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 clean:
-	rm -f $(OBJ)
+	rm -rf $(OBJ_DIR)
 
 fclean: clean
 	rm -f $(NAME)
