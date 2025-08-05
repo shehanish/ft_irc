@@ -1,6 +1,8 @@
-NAME = irc
+NAME = ircserv
 
-SRC = clients/main.cpp clients/clients.cpp 
+SRC = clients/clients.cpp \
+	srcs/Server.cpp \
+	main.cpp
 
 OBJ = $(SRC:.CPP=.o)
 

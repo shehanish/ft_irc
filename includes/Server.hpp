@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/01 17:35:12 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/08/05 18:52:07 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,23 @@
 # define SERVER_HPP
 
 # include <iostream>
+# include <string>
+# include <netinet/in.h>
+# include <cstring>
+# include <unistd.h>
+# include <sys/socket.h>
+# include <errno.h>
 
 class Server
 {
 	private:
-		int			_port;
-		std::string	_password;
-		int			_serversocket;
+		int					_port;
+		int					_serverfd;
+		std::string			_password;
+		struct sockaddr_in	_address;
+		// socklen_t			_adlen;
+
+		int setUpSocket();
 	
 	public:
 		Server();

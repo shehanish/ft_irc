@@ -6,11 +6,12 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 15:30:19 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/04 15:07:24 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/08/05 18:51:52 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
+#include <cstdlib>
 #include "includes/Server.hpp"
 #include "clients/clients.hpp"
 
