@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/06 16:09:27 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/08/06 17:31:14 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,13 @@
 class Server
 {
 	private:
-		char				*_port;
-		int					_serverfd;
-		std::string			_password;
-		struct addrinfo		_specs;
-		struct addrinfo		*_servinfo;
-		socklen_t			_adlen;
+		char*					_port;
+		std::string				_password;
+		int						_serverfd;
+		struct addrinfo			_specs;
+		struct addrinfo			*_servinfo;
+		socklen_t				_adlen;
+		std::map<int, Client>	_clients;
 
 		int setUpSocket(); // private because of encapsulation
 	
@@ -46,7 +47,7 @@ class Server
 		Server& operator=(const Server& other);
 		~Server();
 
-		void run(); // main loop
+		void loop(); // main loop
 		// int	acceptClient() const;
 };
 

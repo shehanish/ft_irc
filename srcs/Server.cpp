@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/06 16:47:31 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/08/06 17:49:03 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,6 @@ int Server::setUpSocket()
 	std::cout << "Server ready and listening on port " << _port << std::endl;
 
 	freeaddrinfo(_servinfo);
-	
 	return (0);
 }
 
@@ -106,28 +105,51 @@ int Server::setUpSocket()
  * If accept() fails, an error message is printed and the loop continues.
  *
  * @note This implementation handles one client at a time and closes the connection immediately after sending the welcome message.
- *       For a production IRC server, concurrent client handling and more robust communication is needed.
+ *       For a production IRC server, concurrent client handling and more robust communication is needed. Client fd and address
+ * 		information should also be linked to the Client class in this program.
  */
 
-void Server::run()
+void Server::loop()
 {
-	int 				client_fd;
+	std::vector<pollfd>	poll_fds;
+	pollfd				server_poll_fd = {_serverfd, POLLIN, 0};
 	sockaddr_storage	client_addr;
 	socklen_t			client_addrlen = sizeof(client_addr);
 
+	poll_fds.push_back(server_poll_fd); // add server socket to poll list
+	
 	while (1)
 	{
-		client_fd = accept(_serverfd, (struct sockaddr *)&client_addr, &client_addrlen);
-		if (client_fd < 0)
+		if (poll(poll_fds.data(), poll_fds.size(), -1) < 0)
 		{
-			std::cerr << "Accept failed: " << std::strerror(errno) << std::endl;
+			std::cerr << "Poll error: " << std::strerror(errno) << std::endl; // check if errno works here
 			continue;
 		}
-		std::cout << "New connection accepted!" << std::endl;
+		
+		for(size_t i = 0; i < poll_fds.size(); i++)
+		{
+			if (poll_fds[i].revents & POLLIN)
+			{
+				if (poll_fds[i].fd == _serverfd)
+				{
+					int client_fd = accept(_serverfd, (struct sockaddr *)&client_addr, &client_addrlen);
+					if (client_fd < 0)
+					{
+						std::cerr << "Failed to accept new client: " << std::strerror(errno) << std::endl;
+						continue;
+					}
+					std::cout << "New connection accepted!" << std::endl;
 
-		std::string welcome = "Welcome to our IRC server 🌎!\r\n";
-		send(client_fd, welcome.c_str(), welcome.length(), 0);
-		close(client_fd);
+					std::string welcome = "Welcome to our IRC server 🌎!\r\n";
+					send(client_fd, welcome.c_str(), welcome.length(), 0);
+					close(client_fd);
+				}
+				else
+				{
+					std::cout << "Work in progress" << std::endl;
+				}
+			}
+		}
 		break; // remove this
 	}
 }
