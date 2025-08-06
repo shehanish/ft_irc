@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/05 18:52:07 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/08/06 13:00:34 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ class Server
 		int					_serverfd;
 		std::string			_password;
 		struct sockaddr_in	_address;
-		// socklen_t			_adlen;
+		socklen_t			_adlen;
 
-		int setUpSocket();
+		int setUpSocket(); // private because of encapsulation
 	
 	public:
 		Server();
@@ -40,6 +40,7 @@ class Server
 		~Server();
 
 		void run(); // main loop
+		// int	acceptClient() const;
 };
 
 #endif

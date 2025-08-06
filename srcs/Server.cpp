@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/05 19:14:11 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/08/06 13:05:08 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,21 +19,19 @@ Server::Server()
 	// std::cout << "Server Default constructor called" << std::endl;
 }
 
-Server::Server(int port, const std::string& password) : _port(port), _password(password)
+Server::Server(int port, const std::string& password) : _port(port), _password(password), _adlen(sizeof(_address))
 {
-	// std::cout << "Server constructor called" << std::endl;
+	std::cout << "Server starting... 🟢" << std::endl;
 	setUpSocket();
 }
 
 Server::Server(const Server& other)
 {
-	// std::cout << "Server Copy constructor called" << std::endl;
 	*this = other;
 }
 
 Server& Server::operator=(const Server& other)
 {
-	// std::cout << "Server Copy Assignment constructor called" << std::endl;
 	if (this != &other) 
 	{
 		this->_port = other._port;
@@ -48,13 +46,12 @@ Server& Server::operator=(const Server& other)
 
 Server::~Server() 
 {
-	// std::cout << "Server Destructor called" << std::endl;
+	std::cout << "Server shutting down 🔴" << std::endl;
+	if (_serverfd >= 0)
+		close(_serverfd);
 }
 
 // MEMBER FUNCTIONS
-
-// this function uses the low level sockaddr struct (which only works for ipv4)
-// but we can upgrade it for ipv6 functionalities by using getaddrinfo() later
 
 
 /**
@@ -75,31 +72,24 @@ int Server::setUpSocket()
 {
 	_serverfd = socket(AF_INET, SOCK_STREAM, 0); // AF_INET is for IPv4, SOCK_STREAM is for tcp/ip 
 	if(_serverfd < 0)
-	{
-		std::cerr << "Error: Could not create socket" << std::endl;
-		return 1; // or exit?
-	}
+		throw std::runtime_error("Error: Could not create socket");
 	
-	// add more specifications here
-	
+	int optvalue = 1;
+	if (setsockopt(_serverfd, SOL_SOCKET, SO_REUSEADDR, &optvalue, sizeof(optvalue)) == 1)
+		throw std::runtime_error("Error: Server cannot be reused");
+		
+	// we use the low level sockaddr_in struct here (which only works for ipv4)
+	// but we can upgrade later for ipv6 functionalities by using getaddrinfo()
 	memset(&_address, 0, sizeof(_address)); // initialize the address struct to zeroes
 	_address.sin_family = AF_INET; // ipv4
 	_address.sin_addr.s_addr = INADDR_ANY; // any address can connect
 	_address.sin_port = htons(_port); // convert host to network notation (necessary check)
 	
 	if (bind(_serverfd, (struct sockaddr*)&_address, sizeof(_address)) < 0)
-	{
-		std::cerr << "Error: Could not bind socket" << std::endl;
-		close (_serverfd);
-		return 1; // or exit?
-	}
+		throw std::runtime_error("Error: Bind failed");
 	
-	if (listen(_serverfd, SOMAXCONN) < 0)
-	{
-		std::cerr << "Error: Could not put socket in listening mode" << std::endl;
-		close (_serverfd);
-		return 1; // or exit?
-	}
+	if (listen(_serverfd, SOMAXCONN) < 0) // SOMAXCONN means that 128 incoming connections can be queued
+		throw std::runtime_error("Error: Could not put socket in listening mode");
 
 	std::cout << "Server ready and listening on port " << _port << std::endl;
 	
@@ -109,5 +99,21 @@ int Server::setUpSocket()
 
 void Server::run()
 {
-	// work in progress
+	int client_fd;
+	
+	while (1)
+	{
+		client_fd = accept(_serverfd, (struct sockaddr *)&_address, &_adlen);
+		if (client_fd < 0)
+		{
+			std::cerr << "Accept failed: " << std::strerror(errno) << std::endl;
+			usleep(1000);
+			continue;
+		}
+		std::cout << "New connection accepted!" << std::endl;
+
+		std::string welcome = "Welcome to our IRC server!\r\n";
+		send(client_fd, welcome.c_str(), welcome.length(), 0);
+		close(client_fd);
+	}
 }
