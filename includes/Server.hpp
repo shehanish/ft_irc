@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/06 13:00:34 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/08/06 16:09:27 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,26 +15,33 @@
 
 # include <iostream>
 # include <string>
+# include <map>
+# include <vector>
+# include <poll.h>
 # include <netinet/in.h>
+# include <netdb.h>
 # include <cstring>
 # include <unistd.h>
 # include <sys/socket.h>
+# include <sys/types.h>
 # include <errno.h>
+# include "../clients/clients.hpp"
 
 class Server
 {
 	private:
-		int					_port;
+		char				*_port;
 		int					_serverfd;
 		std::string			_password;
-		struct sockaddr_in	_address;
+		struct addrinfo		_specs;
+		struct addrinfo		*_servinfo;
 		socklen_t			_adlen;
 
 		int setUpSocket(); // private because of encapsulation
 	
 	public:
 		Server();
-		Server(int port, const std::string& password);
+		Server(char *port, const std::string& password);
 		Server(const Server& other);
 		Server& operator=(const Server& other);
 		~Server();
