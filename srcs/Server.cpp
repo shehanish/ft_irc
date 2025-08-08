@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/06 17:49:03 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/08/08 15:36:43 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ Server::~Server()
 }
 
 // MEMBER FUNCTIONS
-
 
 /**
  * @brief Initializes and configures the server socket for IPv4 TCP connections.
@@ -111,13 +110,13 @@ int Server::setUpSocket()
 
 void Server::loop()
 {
-	std::vector<pollfd>	poll_fds;
+	std::vector<pollfd>	poll_fds; // list of sockets we're watching for activity
 	pollfd				server_poll_fd = {_serverfd, POLLIN, 0};
 	sockaddr_storage	client_addr;
 	socklen_t			client_addrlen = sizeof(client_addr);
 
 	poll_fds.push_back(server_poll_fd); // add server socket to poll list
-	
+
 	while (1)
 	{
 		if (poll(poll_fds.data(), poll_fds.size(), -1) < 0)
@@ -125,7 +124,7 @@ void Server::loop()
 			std::cerr << "Poll error: " << std::strerror(errno) << std::endl; // check if errno works here
 			continue;
 		}
-		
+
 		for(size_t i = 0; i < poll_fds.size(); i++)
 		{
 			if (poll_fds[i].revents & POLLIN)
@@ -142,14 +141,36 @@ void Server::loop()
 
 					std::string welcome = "Welcome to our IRC server 🌎!\r\n";
 					send(client_fd, welcome.c_str(), welcome.length(), 0);
-					close(client_fd);
+					pollfd newclient_pollfd = {client_fd, POLLIN, 0};
+					poll_fds.push_back(newclient_pollfd);
 				}
 				else
 				{
-					std::cout << "Work in progress" << std::endl;
+					char buffer[1024]; // check irc documentation
+					memset(buffer, 0, sizeof(buffer));
+
+					int bytesnum = recv(poll_fds[i].fd, buffer, 1024, 0);
+					if (bytesnum > 0)
+					{
+						std::string msg(buffer, bytesnum);
+						std::cout << "Received from client: " << msg;
+					}
+					else if (bytesnum == 0)
+					{
+						std::cout << "Client " << poll_fds[i].fd << " hung up" << std::endl;
+						close(poll_fds[i].fd);
+						poll_fds.erase(poll_fds.begin() + i);
+						i--;
+					}
+					else 
+					{
+						std::cerr << "Error: " << std::strerror(errno) << std::endl;
+						close(poll_fds[i].fd);
+						poll_fds.erase(poll_fds.begin() + i);
+						i--;
+					}
 				}
 			}
 		}
-		break; // remove this
 	}
 }
