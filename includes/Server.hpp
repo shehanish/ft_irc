@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/06 17:31:14 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/08/11 12:17:50 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,14 +41,24 @@ class Server
 		int setUpSocket(); // private because of encapsulation
 	
 	public:
+		// CONSTRUCTORS AND DESTRUCTOR
+		
 		Server();
 		Server(char *port, const std::string& password);
 		Server(const Server& other);
 		Server& operator=(const Server& other);
 		~Server();
 
+		// GETTERS AND SETTERS
+
+		char*					getPort() const;
+		std::string				getPassword() const;
+		int						getServerfd() const;
+		std::map<int, Client>	&getClients();
+		
+		// MEMBER FUNCTIONS
+		
 		void loop(); // main loop
-		// int	acceptClient() const;
 };
 
 #endif

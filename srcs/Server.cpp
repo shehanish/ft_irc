@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/08 15:36:43 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/08/11 12:19:42 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,28 @@ Server::~Server()
 	std::cout << "Server shutting down 🔴" << std::endl;
 	if (_serverfd >= 0)
 		close(_serverfd);
+}
+
+// GETTERS AND SETTERS
+
+char* Server::getPort() const
+{
+	return (_port);
+}
+
+std::string Server::getPassword() const
+{
+	return (_password);
+}
+
+int Server::getServerfd() const
+{
+	return (_serverfd);
+}
+
+std::map<int, Client>	& Server::getClients()
+{
+	return (_clients);
 }
 
 // MEMBER FUNCTIONS
@@ -127,7 +149,7 @@ void Server::loop()
 
 		for(size_t i = 0; i < poll_fds.size(); i++)
 		{
-			if (poll_fds[i].revents & POLLIN)
+			if (poll_fds[i].revents & POLLIN) // new client connection
 			{
 				if (poll_fds[i].fd == _serverfd)
 				{
@@ -141,19 +163,21 @@ void Server::loop()
 
 					std::string welcome = "Welcome to our IRC server 🌎!\r\n";
 					send(client_fd, welcome.c_str(), welcome.length(), 0);
-					pollfd newclient_pollfd = {client_fd, POLLIN, 0};
+					pollfd newclient_pollfd = {client_fd, POLLIN | POLLOUT, 0};
 					poll_fds.push_back(newclient_pollfd);
+					// add to client struct as well
 				}
-				else
+				else // existing client sends message
 				{
-					char buffer[1024]; // check irc documentation
-					memset(buffer, 0, sizeof(buffer));
+					char message[4096]; // check irc documentation
+					memset(message, 0, sizeof(message));
 
-					int bytesnum = recv(poll_fds[i].fd, buffer, 1024, 0);
+					int bytesnum = recv(poll_fds[i].fd, message, 4096, 0);
 					if (bytesnum > 0)
 					{
-						std::string msg(buffer, bytesnum);
+						std::string msg(message, bytesnum);
 						std::cout << "Received from client: " << msg;
+						// here parsing needs to happen
 					}
 					else if (bytesnum == 0)
 					{
