@@ -2,31 +2,26 @@
 NAME = ircserv
 
 CXX = c++
-
 CXXFLAGS = -Wall -Werror -Wextra -std=c++98 -Iincludes
 
 # ========== Directories ==========
-SRC_DIR     = srcs
-CLIENTS_DIR = clients
-OBJ_DIR     = objs
-INC_DIR     = includes
+SRC_DIR = srcs
+OBJ_DIR = objs
+INC_DIR = includes
 
 # ========== Source Files ==========
-SRC = $(CLIENTS_DIR)/clients.cpp \
-	$(SRC_DIR)/Server.cpp \
-	main.cpp
+SRC = $(wildcard $(SRC_DIR)/**/*.cpp) $(wildcard $(SRC_DIR)/*.cpp)
 
 # ========== Object Files ==========
-OBJ         = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
+OBJ = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
 # ========== Rules ==========
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	@mkdir -p $(dir $(OBJ))
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJ)
 
-$(OBJ_DIR)/%.o: %.cpp
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 

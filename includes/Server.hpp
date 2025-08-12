@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/11 12:17:50 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/08/12 16:57:57 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 # include <sys/socket.h>
 # include <sys/types.h>
 # include <errno.h>
-# include "../clients/clients.hpp"
+# include "../includes/Client.hpp"
 
 class Server
 {
