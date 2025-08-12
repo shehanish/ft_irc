@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/11 12:19:42 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/08/11 14:43:57 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,15 +119,13 @@ int Server::setUpSocket()
 }
 
 /**
- * @brief Main server loop that accepts and handles incoming client connections.
+ * @brief Main server loop that accepts and handles incoming client connections using poll().
  *
- * This function continuously waits for new client connections using accept().
- * For each accepted connection, it sends a welcome message to the client and then closes the connection.
- * If accept() fails, an error message is printed and the loop continues.
+ * This function uses poll() to monitor the server socket and all connected client sockets for activity.
+ * When a new client connects, it accepts the connection, sends a welcome message, and adds the client to the poll list.
+ * For existing clients, it receives messages and handles client disconnections or errors.
  *
- * @note This implementation handles one client at a time and closes the connection immediately after sending the welcome message.
- *       For a production IRC server, concurrent client handling and more robust communication is needed. Client fd and address
- * 		information should also be linked to the Client class in this program.
+ * @note In a next step, this function can be refactored into smaller functions. 
  */
 
 void Server::loop()
@@ -146,8 +144,8 @@ void Server::loop()
 			std::cerr << "Poll error: " << std::strerror(errno) << std::endl; // check if errno works here
 			continue;
 		}
-
-		for(size_t i = 0; i < poll_fds.size(); i++)
+		
+		for(size_t i = 0; i < poll_fds.size(); i++) // use iterator instead?
 		{
 			if (poll_fds[i].revents & POLLIN) // new client connection
 			{
