@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/09 21:18:56 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/12 21:31:16 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,20 @@ class	Channel
 			LimitMode()	: active(false), value(0)	{}
 		};
 		
-		Channel(const std::string &name);
+		Channel(const std::string &name, Client *creator);
 		Channel(const Channel &src);
 		Channel	&operator=(const Channel &src);
 		~Channel();
+
+		void	addUser(Client &user);
+		void	addOperator(Client &user);
+		void	delUser(Client &user);
+		void	delOperator(Client &user);
 		
 	private:
 	
+		//Client				*_creator;
+		int					_index;
 		std::string			_name; /*Apart from the the requirement that the
    first character being either '&' or '#'; the only restriction on a
    channel name is that it may not contain any spaces (' '), a control G

@@ -6,11 +6,13 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/08 08:15:12 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/12 21:22:17 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Server.hpp"
+#include "../includes/Channel.hpp"
+
 
 // CONSTRUCTORS
 
@@ -167,7 +169,7 @@ void Server::loop()
 				}
 				else // existing client sends message
 				{
-					char message[4096]; // check irc documentation
+					char message[4094]; // check irc documentation
 					memset(message, 0, sizeof(message));
 
 					int bytesnum = recv(poll_fds[i].fd, message, 4096, 0);
