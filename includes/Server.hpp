@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/12 21:13:13 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/13 13:42:01 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ class Server
 		struct addrinfo			*_servinfo;
 		socklen_t				_adlen;
 		std::map<int, Client>	_clients;
-		std::map<int, Channel*>	_channels;
+		std::map<std::string, Channel*>	_channels;
 
 		int setUpSocket(); // private because of encapsulation
 	

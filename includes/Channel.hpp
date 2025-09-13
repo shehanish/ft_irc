@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/12 21:31:16 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/13 13:52:24 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ class	Channel
 	private:
 	
 		//Client				*_creator;
-		int					_index;
 		std::string			_name; /*Apart from the the requirement that the
    first character being either '&' or '#'; the only restriction on a
    channel name is that it may not contain any spaces (' '), a control G
