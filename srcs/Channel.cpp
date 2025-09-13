@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/13 13:17:19 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/13 21:55:16 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ void	Channel::addOperator(Client &user)
 void	Channel::delUser(Client &user)
 {
 	_members.erase(&user);
+	user.delUserChannel(this);
 }
 		
 void	Channel::delOperator(Client &user)
