@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/13 21:55:16 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/15 21:14:01 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,4 +74,57 @@ void	Channel::delUser(Client &user)
 void	Channel::delOperator(Client &user)
 {
 	_operators.erase(&user);
+}
+
+bool		Channel::isOperator(Client &user)
+{
+	if (_operators.find(&user) != _operators.end())
+		return true;
+	return false;
+}
+
+bool		Channel::isMember(Client &user)
+{
+	if (_members.find(&user) != _members.end())
+		return true;
+	return false;
+}
+
+std::string	Channel::getTopic()
+{
+	return _topic;
+}
+
+void		Channel::setTopic(std::string &newTopic)
+{
+	_topic = newTopic;
+}
+
+
+void	Channel::setKey(std::string	&pw)
+{
+	_key = pw;
+}
+
+bool	Channel::hasKey()
+{
+	if (_key.empty())
+		return false;
+	return true;
+}
+bool	Channel::checkKey(std::string &pw)
+{
+	if (_key == pw)
+		return true;
+	return false;
+}
+
+bool	Channel::isInviteOnly()
+{
+	return _invite;
+}
+
+void	Channel::setInviteOnly()
+{
+	_invite = true;
 }
