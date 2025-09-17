@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/15 21:14:01 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/16 20:28:30 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,10 @@ void		Channel::setTopic(std::string &newTopic)
 	_topic = newTopic;
 }
 
+void	Channel::restrictTopic()	
+{
+	_topic_restrict = true;
+}
 
 void	Channel::setKey(std::string	&pw)
 {
@@ -127,4 +131,15 @@ bool	Channel::isInviteOnly()
 void	Channel::setInviteOnly()
 {
 	_invite = true;
+}
+
+Channel::LimitMode	Channel::hasLimit()
+{
+	return _limit;
+}
+
+void	Channel::setLimit(int &newLimit)
+{
+	_limit.active = true;
+	_limit.value = newLimit;	
 }
