@@ -6,7 +6,7 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 15:30:19 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/16 17:35:44 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/09/18 15:36:42 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,32 @@
 #include <cstdlib>
 #include "../includes/Server.hpp"
 #include "../includes/Client.hpp"
+#include "Command.hpp"
 
 int main (int argc, char** argv) 
 {
+    
     (void)argc;
     (void)argv;
+
+    Command cmd;
     
-    std::vector<std::string> response;
+    cmd.parse_message("NICK Shehani");
+    
+    std::cout << "COmmand: " << cmd.getCommandName() << std::endl;
 
-    response.push_back("Welcome to the server!");
-    response.push_back("Your nick name has been set!");
-    response.push_back("You joined #genaral");
+    
+    
+    // std::vector<std::string> response;
 
-    for (size_t i = 0; i < response.size(); ++i)
-    {
-        std::cout << response[i] << std::endl;
-    }
+    // response.push_back("Welcome to the server!");
+    // response.push_back("Your nick name has been set!");
+    // response.push_back("You joined #genaral");
+
+    // for (size_t i = 0; i < response.size(); ++i)
+    // {
+    //     std::cout << response[i] << std::endl;
+    // }
     
     return (0);
     

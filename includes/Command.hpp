@@ -6,7 +6,7 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/08 16:55:21 by shkaruna          #+#    #+#             */
-/*   Updated: 2025/09/16 17:49:12 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/09/18 15:55:38 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,19 @@ class Command
 		
 	public:
 		Command();
-		Command();
+		Command(const std::string& raw_message, Client* client, Server* server);
 		Command(const Command& oth);
 		Command& operator=(const Command& oth);
 		~Command();
+
+		//getters
+		std::string getRawMessage() const;
+		std::string getCommandName() const;
+		const std::vector<std::string>& getArguments() const;
+		Client* getClient() const;
+		const std::vector<std::string>& getResponse() const;
+
+		void	parse_message(const std::string& raw_message);
 };
 
 #endif
