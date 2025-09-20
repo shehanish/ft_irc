@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/13 13:42:01 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/20 18:04:55 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 # include <sys/types.h>
 # include <errno.h>
 # include "../includes/Client.hpp"
-//# include "../includes/Channel.hpp"
+# include "../includes/Command.hpp"
 
 class Channel;
 
@@ -62,6 +62,16 @@ class Server
 
 		Channel	*getChannel(const std::string &channel);
 		Channel	*createChannel(const std::string &channel, Client &creator);
+
+		// COMMANDS HANDLERS
+		
+		void	handleJoin(Client &client, const std::vector<std::string> &args);
+		void	handlePart(Client &client, const std::vector<std::string> &args);
+		void	handlePrivMsg(Client &client, const std::vector<std::string> &args);
+		void	handleKick(Client &client, const std::vector<std::string> &args);
+		void	handleInvite(Client &client, const std::vector<std::string> &args);
+		void	handleTopic(Client &client, const std::vector<std::string> &args);
+		void	handleMode(Client &client, const std::vector<std::string> &args);
 		
 		// MEMBER FUNCTIONS
 		

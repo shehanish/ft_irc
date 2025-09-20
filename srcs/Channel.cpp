@@ -3,18 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/16 20:28:30 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/20 18:26:49 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Channel.hpp"
 
 Channel::Channel(const std::string &name, Client *creator)	
-	: _name(name), _topic(), _members(), _operators(), _key(), 
-		_invite(false), _topic_restrict(false)
+	: _name(name), _topic(), _members(), _operators(), _key(), _topic_restrict(false)
 {
 	if (creator)
 	{
@@ -125,12 +124,12 @@ bool	Channel::checkKey(std::string &pw)
 
 bool	Channel::isInviteOnly()
 {
-	return _invite;
+	return _invite.active;
 }
 
 void	Channel::setInviteOnly()
 {
-	_invite = true;
+	_invite.active = true;
 }
 
 Channel::LimitMode	Channel::hasLimit()

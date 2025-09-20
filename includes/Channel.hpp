@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/16 06:57:29 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/20 18:24:49 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,13 @@ class	Channel
 			bool	active;
 			int		value;
 			LimitMode()	: active(false), value(0)	{}
+		};
+		
+		struct	InviteMode
+		{
+			bool	active;
+			std::set<Client*>	clients;
+			InviteMode()	: active(false), clients()	{}	
 		};
 		
 		Channel(const std::string &name, Client *creator);
@@ -58,7 +65,7 @@ class	Channel
 		std::set<Client*>	_operators;
 		
 		std::string			_key;
-		bool				_invite;
+		InviteMode			_invite;
 		bool				_topic_restrict;
 		LimitMode			_limit;
 		

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/15 20:49:40 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/20 18:27:33 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,3 +218,14 @@ Channel*	Server::createChannel(const std::string &channel, Client &creator)
 	_channels[channel] = newChannel;
 	return newChannel;
 }
+
+void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
+{
+	
+}
+void	Server::handlePart(Client &client, const std::vector<std::string> &args);
+void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args);
+void	Server::handleKick(Client &client, const std::vector<std::string> &args);
+void	Server::handleInvite(Client &client, const std::vector<std::string> &args);
+void	Server::handleTopic(Client &client, const std::vector<std::string> &args);
+void	Server::handleMode(Client &client, const std::vector<std::string> &args);
