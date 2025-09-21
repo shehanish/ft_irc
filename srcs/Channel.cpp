@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/20 18:26:49 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/21 17:11:44 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,6 +130,17 @@ bool	Channel::isInviteOnly()
 void	Channel::setInviteOnly()
 {
 	_invite.active = true;
+}
+
+bool		Channel::isInvited(Client &client)
+{
+	if (_invite.active)
+	{
+		if (_invite.clients.find(&client) != _invite.clients.end())
+			return true;	
+		return false;
+	}
+	return true;		
 }
 
 Channel::LimitMode	Channel::hasLimit()

@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/20 18:27:33 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/21 17:34:40 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,9 +221,30 @@ Channel*	Server::createChannel(const std::string &channel, Client &creator)
 
 void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
 {
+	Channel	*channel;
+	
+	if (client.getNbChannel() > MAX_CHANNELS)
+		return; //send message
+	channel = getChannel(args[0]);
+	if (channel == NULL)
+	{
+		channel = createChannel(args[0], client);
+	}
+	else
+	{
+		if (channel->hasKey() && !channel->checkKey(args[1]))
+			return;
+		if (!channel->isInvited(client))
+			return;
+		channel->addUser(client);
+		client.addChannel();
+		//send messages
+	}
+}
+void	Server::handlePart(Client &client, const std::vector<std::string> &args)
+{
 	
 }
-void	Server::handlePart(Client &client, const std::vector<std::string> &args);
 void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args);
 void	Server::handleKick(Client &client, const std::vector<std::string> &args);
 void	Server::handleInvite(Client &client, const std::vector<std::string> &args);
