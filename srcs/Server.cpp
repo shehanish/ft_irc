@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 08:24:14 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/22 12:24:42 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 Server::Server()
 {
 	// std::cout << "Server Default constructor called" << std::endl;
+	_commands["JOIN"] = new JoinCmd();
 }
 
 Server::Server(char *port, const std::string& password) : _port(port), _password(password), _adlen(sizeof(_specs))
@@ -268,8 +269,20 @@ void	Server::handlePart(Client &client, const std::vector<std::string> &args)
 		
 }
 
-void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args);
-void	Server::handleKick(Client &client, const std::vector<std::string> &args);
-void	Server::handleInvite(Client &client, const std::vector<std::string> &args);
+void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
+{
+	
+}
+
+void	Server::handleKick(Client &client, const std::vector<std::string> &args)
+{
+	
+}
+
+void	Server::handleInvite(Client &client, const std::vector<std::string> &args)
+{
+	
+}
+
 void	Server::handleTopic(Client &client, const std::vector<std::string> &args);
 void	Server::handleMode(Client &client, const std::vector<std::string> &args);

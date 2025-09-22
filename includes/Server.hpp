@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/20 18:04:55 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/22 12:17:10 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 # include <sys/types.h>
 # include <errno.h>
 # include "../includes/Client.hpp"
-# include "../includes/Command.hpp"
+# include "../includes/Commands.hpp"
 
 class Channel;
 
@@ -41,6 +41,7 @@ class Server
 		socklen_t				_adlen;
 		std::map<int, Client>	_clients;
 		std::map<std::string, Channel*>	_channels;
+		std::map<std::string, Command*> _commands;
 
 		int setUpSocket(); // private because of encapsulation
 	

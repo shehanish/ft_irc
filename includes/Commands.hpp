@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Command.hpp                                        :+:      :+:    :+:   */
+/*   Commands.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/18 07:38:28 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/22 11:52:53 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/22 12:16:55 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMAND_HPP
-#define COMMAND_HPP
+#ifndef COMMANDS_HPP
+#define COMMANDS_HPP
 
 #include <vector>
 #include <string>
