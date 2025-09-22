@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/18 07:38:28 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/20 17:26:25 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/22 11:52:53 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ class Client;
 class Command
 {
 	public:
-		virtual void execute(Server &server, Client &client, const std::vector<std::string> &args);
+		Command() {}
+		virtual void execute(Server &server, Client &client, const std::vector<std::string> &args) = 0;
 		virtual ~Command() {}
 };
 
