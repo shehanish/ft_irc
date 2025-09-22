@@ -3,20 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/11 14:43:57 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/22 17:55:37 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Server.hpp"
+#include "../includes/Channel.hpp"
+
 
 // CONSTRUCTORS
 
 Server::Server()
 {
 	// std::cout << "Server Default constructor called" << std::endl;
+	_commands["JOIN"] = new JoinCmd();
 }
 
 Server::Server(char *port, const std::string& password) : _port(port), _password(password), _adlen(sizeof(_specs))
@@ -47,6 +50,8 @@ Server& Server::operator=(const Server& other)
 Server::~Server() 
 {
 	std::cout << "Server shutting down 🔴" << std::endl;
+	for (std::map<std::string, Channel*>::iterator mit = _channels.begin(); mit != _channels.end(); mit++)
+		delete mit->second;
 	if (_serverfd >= 0)
 		close(_serverfd);
 }
@@ -195,4 +200,119 @@ void Server::loop()
 			}
 		}
 	}
+}
+
+Channel*	Server::getChannel(const std::string &channel)
+{
+	std::map<std::string, Channel*>::iterator	mit = _channels.find(channel);
+		if (mit != _channels.end())
+			return mit->second;
+	return NULL;
+}
+
+Channel*	Server::createChannel(const std::string &channel, Client &creator)
+{
+	if (getChannel(channel) != NULL)
+		return getChannel(channel);
+		
+	Channel	*newChannel = new Channel(channel, &creator);
+	_channels[channel] = newChannel;
+	return newChannel;
+}
+
+void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
+{
+	Channel	*channel;
+	
+	if (args.empty())
+		return; //message
+	if (client.getNbChannel() > MAX_CHANNELS)
+		return; //send message
+	channel = getChannel(args[0]);
+	if (channel == NULL)
+	{
+		channel = createChannel(args[0], client);
+	}
+	else
+	{
+		if (channel->hasKey() && !channel->checkKey(args[1]))
+			return;
+		if (!channel->isInvited(client))
+			return;
+		channel->addUser(client);
+		client.addChannel();
+		//send messages + topic
+	}
+}
+
+void	Server::handlePart(Client &client, const std::vector<std::string> &args)
+{
+	if (args.empty())
+		return;
+	Channel	*channel;
+	std::vector<std::string>::const_iterator	it = args.begin();
+	for (it; it != args.end(); it ++)
+	{
+		channel = getChannel(*it);
+		if (!channel->isMember(client))
+		{
+			//send msg
+			continue;
+		}
+		channel->delUser(client);
+		if (channel->isOperator(client))
+			channel->delOperator(client);
+		if (channel->isInviteOnly())
+			channel->delInvitation(client);
+		//send part message
+	}
+		
+}
+
+void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
+{
+	
+}
+
+void	Server::handleKick(Client &client, const std::vector<std::string> &args)
+{
+	
+}
+
+void	Server::handleInvite(Client &client, const std::vector<std::string> &args)
+{
+	
+}
+
+void	Server::handleTopic(Client &client, const std::vector<std::string> &args);
+void	Server::handleMode(Client &client, const std::vector<std::string> &args);
+
+void	Server::handlePass(Client &client, const std::vector<std::string> &args)
+{
+	if(client.isAuthenticated())
+	{
+		std::cerr << "462 ERR_ALREADYREGISTRED" << std::endl;
+		return; 
+	}
+	if(args.empty())
+	{
+		std::cerr << "461 ERR_NEEDMOREPARAMS" <<std::endl;
+		return;
+	}
+	if(args[0] != _password)
+	{
+		std::cerr << "464 ERR_PASSWDMISMATCH" << std::endl;
+		return;
+	}
+	client.setIsAuthenticated(true);
+}
+
+void	Server::handleNick(Client &client, const std::vector <std::string> &args)
+{
+	
+}
+
+void	Server::handleUser(Client &cleint, const std::vector <std::string> &args)
+{
+	
 }
