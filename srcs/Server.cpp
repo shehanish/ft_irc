@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 13:21:46 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/22 15:47:31 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,28 @@ int Server::setUpSocket()
 	return (0);
 }
 
+// The extracted message is parsed into the components <prefix>,
+//    <command> and list of parameters (<params>).
+//     The Augmented BNF representation for this is:
+//     message    =  [ ":" prefix SPACE ] command [ params ] crlfbool
+//  example ":Angel PRIVMSG Wiz :Hello are you receiving this message ?"
+bool Server::parse(std::string msg)
+{
+	int len = msg.size();
+	if (len == 0)
+		return (0); // should be "silently ignored"
+	// handle prefix
+	int i = msg.find(' ');
+	if (msg[0] == ';')
+		std::string nick = msg.substr(1, len - i); // where to store this?
+	else
+		return (-1);
+	msg = msg.substr(i + 1, len - i + 1);
+	// handle command
+	i = msg.find(' ');
+	std::string cmd = msg.substr(0, len - i); // where to store this?
+}
+
 /**
  * @brief Main server loop that accepts and handles incoming client connections using poll().
  *
@@ -168,7 +190,7 @@ void Server::loop()
 					send(client_fd, welcome.c_str(), welcome.length(), 0);
 					pollfd newclient_pollfd = {client_fd, POLLIN | POLLOUT, 0};
 					poll_fds.push_back(newclient_pollfd);
-					// add to client struct as well
+					_clients[client_fd] = Client(client_fd); // should we use pointers instead?
 				}
 				else // existing client sends message
 				{
@@ -179,8 +201,8 @@ void Server::loop()
 					if (bytesnum > 0)
 					{
 						std::string msg(message, bytesnum);
-						std::cout << "Received from client: " << msg;
-						// here parsing needs to happen
+						// std::cout << "Received from client: " << msg;
+						parse(msg);
 					}
 					else if (bytesnum == 0)
 					{
@@ -251,7 +273,7 @@ void	Server::handlePart(Client &client, const std::vector<std::string> &args)
 		return;
 	Channel	*channel;
 	std::vector<std::string>::const_iterator	it = args.begin();
-	for (it; it != args.end(); it ++)
+	for (; it != args.end(); ++it)
 	{
 		channel = getChannel(*it);
 		if (!channel->isMember(client))
@@ -271,25 +293,30 @@ void	Server::handlePart(Client &client, const std::vector<std::string> &args)
 
 void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
 {
-	
+	(void)client;
+	(void)args;
 }
 
 void	Server::handleKick(Client &client, const std::vector<std::string> &args)
 {
-	
+	(void)client;
+	(void)args;
 }
 
 void	Server::handleInvite(Client &client, const std::vector<std::string> &args)
 {
-	
+	(void)client;
+	(void)args;	
 }
 
 void	Server::handleTopic(Client &client, const std::vector<std::string> &args)
 {
-	
+	(void)client;
+	(void)args;
 }
 
 void	Server::handleMode(Client &client, const std::vector<std::string> &args)
 {
-	
+	(void)client;
+	(void)args;
 }

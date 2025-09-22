@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 13:25:36 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/22 14:55:49 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,13 @@
 class Client
 {
 	public:
+		Client();
+		Client(int fd);
+		// Client(Client const &other);
+		// Client &operator=(Client const &other);
+		~Client();
+		
+	
 		int	getFd() { return _fd; }
 		std::set<Channel *>	getUserChannel()	{ return _channels; }
 		bool	hasChannel(Channel *channel)	{ return (_channels.find(channel) != _channels.end()); }
