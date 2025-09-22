@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 17:38:51 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/22 17:58:58 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,18 +130,22 @@ int Server::setUpSocket()
 bool Server::parse(std::string msg, Client client)
 {
 	int len = msg.size();
-	if (msg.empty())
+	if (len == 0)
 		return (0); // should be "silently ignored"
+	else if (len > 512)
+		return (-1);
 	
 	// handle prefix
 	int i = msg.find(' ');
 	if (msg[0] == ':')
 	{
 		std::string prefix = msg.substr(1, i - 1);
-		// controll here whether this prefix matches the information in the client object?
+		// check here whether this prefix matches the information in the client object?
 	}
 	else
 		return (-1); // add error handling: "invalid prefix"
+	while (msg[i] == ' ')
+		i++;
 	msg = msg.substr(i + 1, len - i + 1);
 	
 	// handle command
@@ -167,6 +171,8 @@ bool Server::parse(std::string msg, Client client)
 				args.push_back(newarg);
 				if (msg[i + 1] == '\r')
 					break ;
+				while (msg[i] == ' ')
+					i++;
 				msg = msg.substr(i + 1, msg.size() - i);
 			}
 		}
