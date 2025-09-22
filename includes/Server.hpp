@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/12 16:57:57 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/22 12:17:10 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,9 @@
 # include <sys/types.h>
 # include <errno.h>
 # include "../includes/Client.hpp"
+# include "../includes/Commands.hpp"
+
+class Channel;
 
 class Server
 {
@@ -37,6 +40,8 @@ class Server
 		struct addrinfo			*_servinfo;
 		socklen_t				_adlen;
 		std::map<int, Client>	_clients;
+		std::map<std::string, Channel*>	_channels;
+		std::map<std::string, Command*> _commands;
 
 		int setUpSocket(); // private because of encapsulation
 	
@@ -55,6 +60,19 @@ class Server
 		std::string				getPassword() const;
 		int						getServerfd() const;
 		std::map<int, Client>	&getClients();
+
+		Channel	*getChannel(const std::string &channel);
+		Channel	*createChannel(const std::string &channel, Client &creator);
+
+		// COMMANDS HANDLERS
+		
+		void	handleJoin(Client &client, const std::vector<std::string> &args);
+		void	handlePart(Client &client, const std::vector<std::string> &args);
+		void	handlePrivMsg(Client &client, const std::vector<std::string> &args);
+		void	handleKick(Client &client, const std::vector<std::string> &args);
+		void	handleInvite(Client &client, const std::vector<std::string> &args);
+		void	handleTopic(Client &client, const std::vector<std::string> &args);
+		void	handleMode(Client &client, const std::vector<std::string> &args);
 		
 		// MEMBER FUNCTIONS
 		
