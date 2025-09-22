@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/21 17:34:40 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/22 08:24:14 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,6 +223,8 @@ void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
 {
 	Channel	*channel;
 	
+	if (args.empty())
+		return; //message
 	if (client.getNbChannel() > MAX_CHANNELS)
 		return; //send message
 	channel = getChannel(args[0]);
@@ -238,13 +240,34 @@ void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
 			return;
 		channel->addUser(client);
 		client.addChannel();
-		//send messages
+		//send messages + topic
 	}
 }
+
 void	Server::handlePart(Client &client, const std::vector<std::string> &args)
 {
-	
+	if (args.empty())
+		return;
+	Channel	*channel;
+	std::vector<std::string>::const_iterator	it = args.begin();
+	for (it; it != args.end(); it ++)
+	{
+		channel = getChannel(*it);
+		if (!channel->isMember(client))
+		{
+			//send msg
+			continue;
+		}
+		channel->delUser(client);
+		if (channel->isOperator(client))
+			channel->delOperator(client);
+		if (channel->isInviteOnly())
+			channel->delInvitation(client);
+		//send part message
+	}
+		
 }
+
 void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args);
 void	Server::handleKick(Client &client, const std::vector<std::string> &args);
 void	Server::handleInvite(Client &client, const std::vector<std::string> &args);

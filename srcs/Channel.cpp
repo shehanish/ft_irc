@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/21 17:11:44 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/22 08:23:29 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,7 @@ bool	Channel::hasKey()
 		return false;
 	return true;
 }
-bool	Channel::checkKey(std::string &pw)
+bool	Channel::checkKey(const std::string &pw)
 {
 	if (_key == pw)
 		return true;
@@ -141,6 +141,11 @@ bool		Channel::isInvited(Client &client)
 		return false;
 	}
 	return true;		
+}
+
+void	Channel::delInvitation(Client &client)
+{
+	_invite.clients.erase(&client);
 }
 
 Channel::LimitMode	Channel::hasLimit()

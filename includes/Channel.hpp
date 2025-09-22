@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/21 16:48:24 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/22 08:22:13 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,11 @@ class	Channel
 		void		restrictTopic();
 		void		setKey(std::string	&pw);
 		bool		hasKey();
-		bool		checkKey(std::string &pw);
+		bool		checkKey(const std::string &pw);
 		bool		isInviteOnly();
 		bool		isInvited(Client &client);
 		void		setInviteOnly();
+		void		delInvitation(Client &client);
 		LimitMode	hasLimit();
 		void		setLimit(int &limit);
 		
