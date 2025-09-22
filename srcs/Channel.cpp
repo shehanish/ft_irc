@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/22 08:23:29 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/22 13:25:02 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Channel.hpp"
+#include "../includes/Channel.hpp"
 
 Channel::Channel(const std::string &name, Client *creator)	
 	: _name(name), _topic(), _members(), _operators(), _key(), _topic_restrict(false)

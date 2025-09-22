@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 12:17:10 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/22 13:23:39 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,10 @@
 # include <sys/socket.h>
 # include <sys/types.h>
 # include <errno.h>
-# include "../includes/Client.hpp"
-# include "../includes/Commands.hpp"
+# include "Declarations.hpp"
+# include "Channel.hpp"
+# include "Client.hpp"
+# include "Commands.hpp"
 
 class Channel;
 

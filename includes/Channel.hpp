@@ -3,18 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/22 08:22:13 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/22 13:25:11 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
-#include <set>
-#include "Server.hpp"
+# include <set>
+# include "Declarations.hpp"
+# include "Client.hpp"
+# include <string>
+# include <sys/socket.h>
 
 class	Channel
 {

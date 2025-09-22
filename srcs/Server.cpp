@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 12:24:42 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/22 13:21:46 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,5 +284,12 @@ void	Server::handleInvite(Client &client, const std::vector<std::string> &args)
 	
 }
 
-void	Server::handleTopic(Client &client, const std::vector<std::string> &args);
-void	Server::handleMode(Client &client, const std::vector<std::string> &args);
+void	Server::handleTopic(Client &client, const std::vector<std::string> &args)
+{
+	
+}
+
+void	Server::handleMode(Client &client, const std::vector<std::string> &args)
+{
+	
+}

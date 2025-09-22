@@ -3,15 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 12:47:54 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/22 13:25:36 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
+
+# include "Declarations.hpp"
+# include <set>
+# include <string>
+# include <sys/socket.h>
 
 class Client
 {
@@ -35,7 +40,7 @@ class Client
 		void	sendMsg(Client &client, std::string &msg)	
 		{ 
 			if (!msg.empty())
-				send(client._fd, msg, msg.length(), 0);
+				send(client._fd, msg.c_str(), msg.length(), 0);
 		}
 			
 	private:

@@ -1,28 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   Declarations.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/28 15:30:19 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 13:16:55 by lde-taey         ###   ########.fr       */
+/*   Created: 2025/09/22 13:15:35 by lde-taey          #+#    #+#             */
+/*   Updated: 2025/09/22 13:19:42 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>
-#include <cstdlib>
-#include "../includes/Declarations.hpp"
-#include "../includes/Server.hpp"
+#ifndef DECLARATIONS_H
+#define DECLARATIONS_H
 
-int main (int argc, char** argv) 
-{
-    if (argc != 3) 
-    {
-        std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
-        return (1);
-    }
-    Server server(argv[1], argv[2]);
-    server.loop();
-    return (0);
-}
+// Forward declarations for classes/structs
+class Channel;
+class Client;
+class Server;
+
+#endif
