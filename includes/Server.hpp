@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 17:33:57 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/22 18:13:43 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ class Server
 		struct addrinfo			_specs;
 		struct addrinfo			*_servinfo;
 		socklen_t				_adlen;
-		std::map<int, Client>	_clients;
+		std::map<int, Client*>	_clients;
 		std::map<std::string, Channel*>	_channels;
 		std::map<std::string, Command*> _commands;
 
@@ -61,7 +61,7 @@ class Server
 		char*					getPort() const;
 		std::string				getPassword() const;
 		int						getServerfd() const;
-		std::map<int, Client>	&getClients();
+		std::map<int, Client*>	&getClients();
 
 		Channel	*getChannel(const std::string &channel);
 		Channel	*createChannel(const std::string &channel, Client &creator);
@@ -79,7 +79,7 @@ class Server
 		// MEMBER FUNCTIONS
 		
 		void loop(); // main loop
-		bool parse(std::string msg, Client client);
+		bool parse(std::string msg, Client *client);
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 17:58:58 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/22 18:13:33 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ int Server::getServerfd() const
 	return (_serverfd);
 }
 
-std::map<int, Client>	& Server::getClients()
+std::map<int, Client*>	& Server::getClients()
 {
 	return (_clients);
 }
@@ -125,9 +125,10 @@ int Server::setUpSocket()
 }
 
 // The extracted message is parsed into the components <prefix>, <command> and list of parameters (<params>).
-// The Augmented BNF representation for this is: message    =  [ ":" prefix SPACE ] command [ params ] crlfbool
+// The Augmented BNF representation for this is: message = [ ":" prefix] SPACE [command] SPACE [args] /r/n
+// There can be a trailing (last argument) that contains spaces, it is preceded by ':'
 // Example ":Angel PRIVMSG Wiz :Hello are you receiving this message ?"
-bool Server::parse(std::string msg, Client client)
+bool Server::parse(std::string msg, Client *client)
 {
 	int len = msg.size();
 	if (len == 0)
@@ -177,7 +178,7 @@ bool Server::parse(std::string msg, Client client)
 			}
 		}
 		// pass to execute
-		it->second->execute(*this, client, args);
+		it->second->execute(*this, *client, args);
 	}
 	else
 		return (-1); // add error handling: "invalid command"
@@ -232,7 +233,7 @@ void Server::loop()
 					// Cast to sockaddr_in to access sin_addr (choosing IPv4 here!)
 					struct sockaddr_in *addr_in = (struct sockaddr_in *)&client_addr;
 					std::string client_ip = inet_ntoa(addr_in->sin_addr);
-					_clients[client_fd] = Client(client_fd, client_ip);
+					_clients[client_fd] = new Client(client_fd, client_ip);
 				}
 				else // existing client sends message
 				{
@@ -244,7 +245,7 @@ void Server::loop()
 					{
 						std::string msg(message, bytesnum);
 						// std::cout << "Received from client: " << msg;
-						std::map<int, Client>::iterator it = _clients.find(poll_fds[i].fd);
+						std::map<int, Client*>::iterator it = _clients.find(poll_fds[i].fd);
 						parse(msg, it->second);
 					}
 					else if (bytesnum == 0)
