@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 14:55:49 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/22 16:18:55 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,53 @@
 # include <set>
 # include <string>
 # include <sys/socket.h>
+#include <iostream>
 
 class Client
 {
+	private:
+		int	_fd;
+		int	_nb_chan;
+		std::string	_nick;
+		std::string	_buffer;
+		std::set<Channel *>	_channels;
+		std::string	_ipAddress;
+		std::string _username;
+		std::string _realname;
+		std::string	_recvBuffer;
+		std::string _sendBuffer;
+		bool		_isAuthenticated;
+
 	public:
+		// Constructors and Destructor
 		Client();
-		Client(int fd);
-		// Client(Client const &other);
-		// Client &operator=(Client const &other);
+		Client(int fd, const std::string& ip);
+		Client(const Client& oth);
+		Client&	operator=(const Client& oth);
 		~Client();
 		
-	
+		//Getters
+		int		getFd() const;
+		std::string	getNick() const;
+		std::string getUserName() const;
+		std::string getRealName() const;
+		std::string getRecvBuffer() const;
+		std::string getSendBuffer() const;
+		bool	isAuthenticated() const;
+
+		// Setters
+		void 	setFd(int fd);
+		void 	setNick(const std::string& nick);
+		void 	setUserName(const std::string& username);
+		void 	setRealName(const std::string& realname);
+		void 	setRecvBuffer(const std::string& recvbuffer);
+		void 	setSendBuffer(const std::string& sendbuffer);
+		void 	setIsAuthenticated(bool value);
+
+		void	appendToSendBuffer(const std::string& data);
+		void	clearSendBUffer();
+
+		// Member functions
 		int	getFd() { return _fd; }
 		std::set<Channel *>	getUserChannel()	{ return _channels; }
 		bool	hasChannel(Channel *channel)	{ return (_channels.find(channel) != _channels.end()); }
@@ -49,14 +85,7 @@ class Client
 			if (!msg.empty())
 				send(client._fd, msg.c_str(), msg.length(), 0);
 		}
-			
-	private:
-		int	_fd;
-		int	_nb_chan;
-		std::string	_nick;
-		std::string	_buffer;
-		std::set<Channel *>	_channels;
-	
+		
 };
 
 const int MAX_CHANNELS = 10;
