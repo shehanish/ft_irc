@@ -6,12 +6,13 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 15:47:31 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/22 17:38:51 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Server.hpp"
 #include "../includes/Channel.hpp"
+#include <arpa/inet.h>
 
 
 // CONSTRUCTORS
@@ -123,26 +124,58 @@ int Server::setUpSocket()
 	return (0);
 }
 
-// The extracted message is parsed into the components <prefix>,
-//    <command> and list of parameters (<params>).
-//     The Augmented BNF representation for this is:
-//     message    =  [ ":" prefix SPACE ] command [ params ] crlfbool
-//  example ":Angel PRIVMSG Wiz :Hello are you receiving this message ?"
-bool Server::parse(std::string msg)
+// The extracted message is parsed into the components <prefix>, <command> and list of parameters (<params>).
+// The Augmented BNF representation for this is: message    =  [ ":" prefix SPACE ] command [ params ] crlfbool
+// Example ":Angel PRIVMSG Wiz :Hello are you receiving this message ?"
+bool Server::parse(std::string msg, Client client)
 {
 	int len = msg.size();
-	if (len == 0)
+	if (msg.empty())
 		return (0); // should be "silently ignored"
+	
 	// handle prefix
 	int i = msg.find(' ');
-	if (msg[0] == ';')
-		std::string nick = msg.substr(1, len - i); // where to store this?
+	if (msg[0] == ':')
+	{
+		std::string prefix = msg.substr(1, i - 1);
+		// controll here whether this prefix matches the information in the client object?
+	}
 	else
-		return (-1);
+		return (-1); // add error handling: "invalid prefix"
 	msg = msg.substr(i + 1, len - i + 1);
+	
 	// handle command
 	i = msg.find(' ');
-	std::string cmd = msg.substr(0, len - i); // where to store this?
+	std::string cmd = msg.substr(0, i);
+	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
+	if (it != _commands.end())
+	{		
+		// parse args first
+		std::vector<std::string> args;
+		while(!msg.empty())
+		{
+			i = msg.find(' ');
+			if (msg[0] == ':')
+			{
+				std::string newarg = msg;
+				args.push_back(newarg);
+				break;
+			}
+			else
+			{
+				std::string newarg = msg.substr(0, msg.size() - i);
+				args.push_back(newarg);
+				if (msg[i + 1] == '\r')
+					break ;
+				msg = msg.substr(i + 1, msg.size() - i);
+			}
+		}
+		// pass to execute
+		it->second->execute(*this, client, args);
+	}
+	else
+		return (-1); // add error handling: "invalid command"
+	return (0);
 }
 
 /**
@@ -190,7 +223,10 @@ void Server::loop()
 					send(client_fd, welcome.c_str(), welcome.length(), 0);
 					pollfd newclient_pollfd = {client_fd, POLLIN | POLLOUT, 0};
 					poll_fds.push_back(newclient_pollfd);
-					_clients[client_fd] = Client(client_fd); // should we use pointers instead?
+					// Cast to sockaddr_in to access sin_addr (choosing IPv4 here!)
+					struct sockaddr_in *addr_in = (struct sockaddr_in *)&client_addr;
+					std::string client_ip = inet_ntoa(addr_in->sin_addr);
+					_clients[client_fd] = Client(client_fd, client_ip);
 				}
 				else // existing client sends message
 				{
@@ -202,7 +238,8 @@ void Server::loop()
 					{
 						std::string msg(message, bytesnum);
 						// std::cout << "Received from client: " << msg;
-						parse(msg);
+						std::map<int, Client>::iterator it = _clients.find(poll_fds[i].fd);
+						parse(msg, it->second);
 					}
 					else if (bytesnum == 0)
 					{

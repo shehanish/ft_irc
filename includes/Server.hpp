@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 15:42:26 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/22 17:33:57 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ class Server
 		// MEMBER FUNCTIONS
 		
 		void loop(); // main loop
-		bool parse(std::string msg);
+		bool parse(std::string msg, Client client);
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 16:18:55 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/22 16:25:13 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@ class Client
 	private:
 		int	_fd;
 		int	_nb_chan;
+		std::string	_ipAddress;
 		std::string	_nick;
 		std::string	_buffer;
 		std::set<Channel *>	_channels;
-		std::string	_ipAddress;
 		std::string _username;
 		std::string _realname;
 		std::string	_recvBuffer;
@@ -38,8 +38,8 @@ class Client
 		// Constructors and Destructor
 		Client();
 		Client(int fd, const std::string& ip);
-		Client(const Client& oth);
-		Client&	operator=(const Client& oth);
+		// Client(const Client& oth);
+		// Client&	operator=(const Client& oth);
 		~Client();
 		
 		//Getters
