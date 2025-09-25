@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 12:17:10 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/25 08:41:33 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,10 @@ class Server
 		struct addrinfo			_specs;
 		struct addrinfo			*_servinfo;
 		socklen_t				_adlen;
-		std::map<int, Client>	_clients;
+		std::map<int, Client*>	_clients;
 		std::map<std::string, Channel*>	_channels;
 		std::map<std::string, Command*> _commands;
-
+		
 		int setUpSocket(); // private because of encapsulation
 	
 	public:
@@ -63,7 +63,9 @@ class Server
 
 		Channel	*getChannel(const std::string &channel);
 		Channel	*createChannel(const std::string &channel, Client &creator);
-
+		
+		Client	*getUser(const std::string &nick);
+		
 		// COMMANDS HANDLERS
 		
 		void	handleJoin(Client &client, const std::vector<std::string> &args);
@@ -77,6 +79,7 @@ class Server
 		// MEMBER FUNCTIONS
 		
 		void loop(); // main loop
+		void	broadcastMsg(std::vector<std::string> args, Client &client);
 };
 
 #endif

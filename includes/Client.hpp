@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 12:47:54 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/22 19:37:04 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,9 @@ class Client
 		std::string	getName()	{ return _nick; }
 		void	addChannel()	{ _nb_chan++; }
 		void	sendMsg(Client &client, std::string &msg)	
-		{ 
+		{
 			if (!msg.empty())
-				send(client._fd, msg, msg.length(), 0);
+				send(client._fd, msg.c_str(), msg.size(), 0);
 		}
 			
 	private:
@@ -44,7 +44,6 @@ class Client
 		std::string	_nick;
 		std::string	_buffer;
 		std::set<Channel *>	_channels;
-	
 };
 
 const int MAX_CHANNELS = 10;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 12:24:42 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/25 08:56:37 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,6 +218,44 @@ Channel*	Server::createChannel(const std::string &channel, Client &creator)
 	Channel	*newChannel = new Channel(channel, &creator);
 	_channels[channel] = newChannel;
 	return newChannel;
+}
+
+Client*	Server::getUser(const std::string &nick)
+{
+	std::map<int, Client*>::iterator	mit = _clients.begin();
+	for (mit; mit != _clients.end(); mit ++)
+	{
+		if (mit->second->getName() == nick)
+			return mit->second;
+	}
+	return NULL;
+}
+
+void	Server::broadcastMsg(std::vector<std::string> args, Client &client)
+{
+	std::string	&msg = getMsg(args);
+	std::vector<std::string>::iterator	it = args.begin();
+	while (it != args.end())
+	{
+		if ((*it)[0] == '#')
+		{
+			Channel	*channel = getChannel(*it);
+			if (channel == NULL)
+				{}//
+			std::set<Client*>::iterator	sit = channel->getMembers().begin();
+			for (sit; sit != channel->getMembers().end(); sit++)
+				(*sit)->sendMsg(msg);
+		}
+		else if ((*it)[0] == ':')
+			break;
+		else
+		{
+			Client	*target = getUser(*it);
+			if (target == NULL)
+				{} //send error msg
+			target->sendMsg(msg);
+		}
+	}
 }
 
 void	Server::handleJoin(Client &client, const std::vector<std::string> &args)

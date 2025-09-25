@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/22 08:23:29 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/24 07:22:50 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,11 @@ bool		Channel::isMember(Client &user)
 	if (_members.find(&user) != _members.end())
 		return true;
 	return false;
+}
+
+std::set<Client*>	Channel::getMembers()
+{
+	return _members;
 }
 
 std::string	Channel::getTopic()
