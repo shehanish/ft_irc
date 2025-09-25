@@ -6,7 +6,7 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 17:01:16 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/09/25 13:45:35 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,8 @@ class Server
 		void	handleUser(Client &client, const std::vector<std::string> &args);
 		void	handleQuit(Client &client, const std::vector<std::string> &args);
 		
+		bool	isNickTaken(const std::string &nickname) const;
+		void 	registerClient(Client &client);
 		
 		// MEMBER FUNCTIONS
 		

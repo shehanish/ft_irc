@@ -6,7 +6,7 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 17:55:37 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/09/25 13:49:45 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -306,12 +306,46 @@ void	Server::handlePass(Client &client, const std::vector<std::string> &args)
 	}
 	client.setIsAuthenticated(true);
 }
-
+bool	Server::isNickTaken(const std::string &nickname) const
+{
+	for(std::map<int, Client>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		if (it->second.getNick() == nickname)
+			return true;
+	}
+	return false;
+}
 void	Server::handleNick(Client &client, const std::vector <std::string> &args)
 {
+	if(args.empty())
+	{
+		std::cerr << "Empty arguments!" << std::endl;
+		return;
+	}
+	std::string nickname = args[0];
 	
+	if(isNickTaken(nickname))
+	{
+		std::cerr << "Nick name has already taken!" << std::endl;
+		return;
+	}
+	client.setNick(nickname);
+	std::cout << "Nickname set to  " << nickname << std::endl;
 }
 
+void	Server::registerClient(Client &client)
+{
+	if(client.isRegistered())
+	{
+		return;
+	}
+	if(client.isAuthenticated() || client.getNick().empty() || client.getUserName().empty())
+	{
+		return;
+	}
+	client.setRegistered(true);
+	
+}
 void	Server::handleUser(Client &cleint, const std::vector <std::string> &args)
 {
 	

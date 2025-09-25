@@ -6,7 +6,7 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 16:44:12 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/09/25 13:13:37 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,8 @@ private:
     std::string _realname;
     std::string _recvBuffer;
     std::string _sendBuffer;
-    bool _isAuthenticated;
+    bool        _isAuthenticated;
+    bool        _isRegistered;
     int _nb_chan;
     std::set<Channel *> _channels;
 
@@ -75,6 +76,10 @@ public:
     void appendToSendBuffer(const std::string& data);
     void clearSendBuffer();
     void sendMsg(Client &client, const std::string &msg);
+
+    //Registration
+    bool    isRegistered() const { return _isRegistered; }
+    bool    setRegistered(bool value) {_isRegistered = value; }
 };
 
 #endif
