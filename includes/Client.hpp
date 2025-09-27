@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 19:37:04 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/25 21:29:35 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,12 @@ class Client
 		int	getNbChannel()	{ return _nb_chan; }
 		std::string	getName()	{ return _nick; }
 		void	addChannel()	{ _nb_chan++; }
+		
+		std::string	&getMsg(std::vector<std::string> &args)
+		{
+			return	*(args.end() - 1);
+		}
+		
 		void	sendMsg(Client &client, std::string &msg)	
 		{
 			if (!msg.empty())

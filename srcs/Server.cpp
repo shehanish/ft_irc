@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/25 08:56:37 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/27 12:03:37 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,7 +233,7 @@ Client*	Server::getUser(const std::string &nick)
 
 void	Server::broadcastMsg(std::vector<std::string> args, Client &client)
 {
-	std::string	&msg = getMsg(args);
+	std::string	&msg = client.getMsg(args);
 	std::vector<std::string>::iterator	it = args.begin();
 	while (it != args.end())
 	{
@@ -244,7 +244,7 @@ void	Server::broadcastMsg(std::vector<std::string> args, Client &client)
 				{}//
 			std::set<Client*>::iterator	sit = channel->getMembers().begin();
 			for (sit; sit != channel->getMembers().end(); sit++)
-				(*sit)->sendMsg(msg);
+				client.sendMsg(**sit, msg);
 		}
 		else if ((*it)[0] == ':')
 			break;
@@ -253,7 +253,7 @@ void	Server::broadcastMsg(std::vector<std::string> args, Client &client)
 			Client	*target = getUser(*it);
 			if (target == NULL)
 				{} //send error msg
-			target->sendMsg(msg);
+			client.sendMsg(*target, msg);
 		}
 	}
 }
