@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/29 17:42:01 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/29 17:45:20 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,7 @@ bool Server::parse(std::string msg, Client *client)
 	while (pos < msg.size() && msg[pos] == ' ')
 		pos++;
 	if (pos >= msg.size())
-		return (-1); // no command found
+		return false; // no command found
 	
 	// extract command
 	size_t cmd_start = pos;
@@ -220,8 +220,8 @@ bool Server::parse(std::string msg, Client *client)
 	
 	// pass to execute
 	// it->second->execute(*this, *client, args);
-	(void)*client;
-	return (0);
+	(void)*client; // TODO change this and uncomment the above
+	return true;
 }
 
 /**
