@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 18:13:33 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/29 17:42:01 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,6 +124,8 @@ int Server::setUpSocket()
 	return (0);
 }
 
+// use nc for testing
+//
 // The extracted message is parsed into the components <prefix>, <command> and list of parameters (<params>).
 // The Augmented BNF representation for this is: message = [ ":" prefix] SPACE [command] SPACE [args] /r/n
 // There can be a trailing (last argument) that contains spaces, it is preceded by ':'
@@ -132,56 +134,93 @@ bool Server::parse(std::string msg, Client *client)
 {
 	int len = msg.size();
 	if (len == 0)
-		return (0); // should be "silently ignored"
+		return true; // should be "silently ignored"
 	else if (len > 512)
-		return (-1);
+		return false; // see rules	
+
+	size_t pos = 0;
 	
-	// handle prefix
-	int i = msg.find(' ');
+    // trim /r/n
+	size_t end = msg.find_last_not_of("\r\n");
+	if (end == std::string::npos)
+    	return true; // String was only \r\n characters
+	msg = msg.substr(0, end + 1);
+	
+	// extract prefix
 	if (msg[0] == ':')
 	{
-		std::string prefix = msg.substr(1, i - 1);
-		// check here whether this prefix matches the information in the client object?
+		size_t space_pos = msg.find(' ');
+		if (space_pos == std::string::npos)
+			return false; // : without prefix
+		std::string prefix = msg.substr(1, space_pos - 1);
+		std::cout << "The prefix is: " << prefix << std::endl;
+		pos = space_pos;
+		// check whether prefix is valid or do whatever is necessary
 	}
-	else
-		return (-1); // add error handling: "invalid prefix"
-	while (msg[i] == ' ')
-		i++;
-	msg = msg.substr(i + 1, len - i + 1);
+	while (pos < msg.size() && msg[pos] == ' ')
+		pos++;
+	if (pos >= msg.size())
+		return (-1); // no command found
 	
-	// handle command
-	i = msg.find(' ');
-	std::string cmd = msg.substr(0, i);
-	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
-	if (it != _commands.end())
-	{		
-		// parse args first
-		std::vector<std::string> args;
-		while(!msg.empty())
-		{
-			i = msg.find(' ');
-			if (msg[0] == ':')
-			{
-				std::string newarg = msg;
-				args.push_back(newarg);
-				break;
-			}
-			else
-			{
-				std::string newarg = msg.substr(0, msg.size() - i);
-				args.push_back(newarg);
-				if (msg[i + 1] == '\r')
-					break ;
-				while (msg[i] == ' ')
-					i++;
-				msg = msg.substr(i + 1, msg.size() - i);
-			}
-		}
-		// pass to execute
-		it->second->execute(*this, *client, args);
+	// extract command
+	size_t cmd_start = pos;
+    size_t cmd_end = msg.find(' ', cmd_start);
+	
+	std::string cmd;
+    if (cmd_end == std::string::npos)
+        cmd = msg.substr(cmd_start);
+    else
+	{
+        cmd = msg.substr(cmd_start, cmd_end - cmd_start);
 	}
-	else
-		return (-1); // add error handling: "invalid command"
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper); // convert to capitals
+	std::cout << "The command is: " << cmd << std::endl;
+
+	// look up command
+	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
+	if (it == _commands.end())
+	{
+		std::cout << "Command has not yet been implemented" << std::endl; // TODO remove this and uncomment following line
+		// return (false); // unknown or invalid command
+	}
+	
+	pos = cmd_end;
+
+	
+	// parse args
+	std::vector<std::string> args;
+    while (pos < msg.size())	
+	{
+		while (pos < msg.size() && msg[pos] == ' ')
+			pos++;
+		if (msg[pos] == ':')
+		{
+			std::string newarg = msg.substr(pos); // include the ':'
+			args.push_back(newarg);
+			break;
+		}
+		else
+		{
+			size_t next_space = msg.find(' ', pos);
+			if (next_space == std::string::npos)
+            {
+                args.push_back(msg.substr(pos));
+                break;
+            }
+			std::string nextarg = msg.substr(pos, next_space - pos);
+			args.push_back(nextarg);
+			pos = next_space;
+		}
+	}
+	// print args
+	for (size_t i = 0; i < args.size(); i++)
+	{
+		std::cout << "Arg " << i + 1 << ": " << args[i] << std::endl;
+	}
+	
+	// pass to execute
+	// it->second->execute(*this, *client, args);
+	(void)*client;
 	return (0);
 }
 
@@ -244,7 +283,7 @@ void Server::loop()
 					if (bytesnum > 0)
 					{
 						std::string msg(message, bytesnum);
-						// std::cout << "Received from client: " << msg;
+						std::cout << "Received from client: " << msg;
 						std::map<int, Client*>::iterator it = _clients.find(poll_fds[i].fd);
 						parse(msg, it->second);
 					}

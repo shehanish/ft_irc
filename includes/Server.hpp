@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 18:13:43 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/24 15:46:04 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <string>
 # include <map>
 # include <vector>
+# include <algorithm>
 # include <poll.h>
 # include <netinet/in.h>
 # include <netdb.h>
