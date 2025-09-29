@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/24 07:22:50 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/29 17:26:20 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,10 @@ void	Channel::delUser(Client &user)
 {
 	_members.erase(&user);
 	user.delUserChannel(this);
+	if (isOperator(user))
+		this->delOperator(user);
+	if (isInviteOnly() && isInvited(user))
+		this->delInvitation(user);
 }
 		
 void	Channel::delOperator(Client &user)

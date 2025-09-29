@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/25 08:41:33 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/29 18:10:51 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ class Server
 		char*					getPort() const;
 		std::string				getPassword() const;
 		int						getServerfd() const;
-		std::map<int, Client>	&getClients();
+		std::map<int, Client*>	&getClients();
 
 		Channel	*getChannel(const std::string &channel);
 		Channel	*createChannel(const std::string &channel, Client &creator);
@@ -75,6 +75,11 @@ class Server
 		void	handleInvite(Client &client, const std::vector<std::string> &args);
 		void	handleTopic(Client &client, const std::vector<std::string> &args);
 		void	handleMode(Client &client, const std::vector<std::string> &args);
+		
+		// HELPER FUNCTIONS
+
+		const std::vector<Client*>	getUserArguments(const std::vector<std::string> &args);
+		const std::vector<Channel*>	getChanArguments(const std::vector<std::string> &args);
 		
 		// MEMBER FUNCTIONS
 		

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/27 12:03:37 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/29 18:27:19 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ int Server::getServerfd() const
 	return (_serverfd);
 }
 
-std::map<int, Client>	& Server::getClients()
+std::map<int, Client*>	& Server::getClients()
 {
 	return (_clients);
 }
@@ -310,11 +310,35 @@ void	Server::handlePart(Client &client, const std::vector<std::string> &args)
 void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
 {
 	
+	
 }
 
 void	Server::handleKick(Client &client, const std::vector<std::string> &args)
 {
+	//KICK <channel>{,<channel>} <user>{,<user>} [<comment>]
+	std::vector<Client*>	users = getUserArguments(args);
+	std::vector<Channel*>	channels = getChanArguments(args);
+	bool	comment = false;
 	
+	std::string *msg = client.getMsg(args);
+	
+	int	i = 0;
+	int	j = 0;
+	while (i < channels.size() && j < users.size())
+	{
+		channels[i++]->delUser(*(users[j++]));			
+	}
+	if (i == channels.size() && j < users.size())
+	{
+		while (j < users.size())
+			channels[i]->delUser(*(users[j++]));
+	}
+	else if (j == users.size() && i < channels.size())
+	{
+		while (i < channels.size())
+			channels[i]->delUser(*(users[j]));
+	}
+		
 }
 
 void	Server::handleInvite(Client &client, const std::vector<std::string> &args)
