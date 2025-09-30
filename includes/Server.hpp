@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/29 18:10:51 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/30 07:21:16 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ class Server
 		// MEMBER FUNCTIONS
 		
 		void loop(); // main loop
-		void	broadcastMsg(std::vector<std::string> args, Client &client);
+		void	broadcastMsg(Client &client, std::vector<std::string> args);
 };
 
 #endif
