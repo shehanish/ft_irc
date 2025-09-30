@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/25 08:41:33 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/28 13:05:00 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ class Server
 		// MEMBER FUNCTIONS
 		
 		void loop(); // main loop
-		void	broadcastMsg(std::vector<std::string> args, Client &client);
+		void	broadcastMsg(Client &client, std::vector<std::string> args);
 };
 
 #endif

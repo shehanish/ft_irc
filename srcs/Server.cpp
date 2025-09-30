@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/27 12:03:37 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/30 07:08:22 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,7 +231,7 @@ Client*	Server::getUser(const std::string &nick)
 	return NULL;
 }
 
-void	Server::broadcastMsg(std::vector<std::string> args, Client &client)
+void	Server::broadcastMsg(Client &client, std::vector<std::string> args)
 {
 	std::string	&msg = client.getMsg(args);
 	std::vector<std::string>::iterator	it = args.begin();
@@ -241,18 +241,16 @@ void	Server::broadcastMsg(std::vector<std::string> args, Client &client)
 		{
 			Channel	*channel = getChannel(*it);
 			if (channel == NULL)
-				{}//
+				{}//401 ERR_NOSUCHNICK "<nickname> :No such nick/channel"
 			std::set<Client*>::iterator	sit = channel->getMembers().begin();
 			for (sit; sit != channel->getMembers().end(); sit++)
 				client.sendMsg(**sit, msg);
 		}
-		else if ((*it)[0] == ':')
-			break;
 		else
 		{
 			Client	*target = getUser(*it);
 			if (target == NULL)
-				{} //send error msg
+				{} //401 ERR_NOSUCHNICK "<nickname> :No such nick/channel"
 			client.sendMsg(*target, msg);
 		}
 	}
@@ -309,12 +307,17 @@ void	Server::handlePart(Client &client, const std::vector<std::string> &args)
 
 void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
 {
-	
+	if (!args.empty())
+		broadcastMsg(client, args);
 }
+
+// KICK <channel> <user> [<comment>]
 
 void	Server::handleKick(Client &client, const std::vector<std::string> &args)
 {
 	
+	
+
 }
 
 void	Server::handleInvite(Client &client, const std::vector<std::string> &args)
