@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/24 15:46:04 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/30 15:12:20 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,11 @@
 # include <netinet/in.h>
 # include <netdb.h>
 # include <cstring>
+# include <csignal>
 # include <unistd.h>
 # include <sys/socket.h>
 # include <sys/types.h>
 # include <errno.h>
-# include "Declarations.hpp"
 # include "Channel.hpp"
 # include "Client.hpp"
 # include "Commands.hpp"
@@ -46,15 +46,15 @@ class Server
 		std::map<std::string, Channel*>	_channels;
 		std::map<std::string, Command*> _commands;
 
+		Server(); // private because no server should be constructed without port or password
+		Server(const Server& other); // private because copying should not be possible (still OCF)
+		Server& operator=(const Server& other); // same ^
 		int setUpSocket(); // private because of encapsulation
 	
 	public:
-		// CONSTRUCTORS AND DESTRUCTOR
 		
-		Server();
+		// CONSTRUCTORS AND DESTRUCTOR
 		Server(char *port, const std::string& password);
-		Server(const Server& other);
-		Server& operator=(const Server& other);
 		~Server();
 
 		// GETTERS AND SETTERS
@@ -63,9 +63,8 @@ class Server
 		std::string				getPassword() const;
 		int						getServerfd() const;
 		std::map<int, Client*>	&getClients();
-
-		Channel	*getChannel(const std::string &channel);
-		Channel	*createChannel(const std::string &channel, Client &creator);
+		Channel					*getChannel(const std::string &channel);
+		Channel					*createChannel(const std::string &channel, Client &creator);
 
 		// COMMANDS HANDLERS
 		
@@ -79,8 +78,10 @@ class Server
 		
 		// MEMBER FUNCTIONS
 		
+		void serverInit();
 		void loop(); // main loop
 		bool parse(std::string msg, Client *client);
+		void cleanup();
 };
 
 #endif

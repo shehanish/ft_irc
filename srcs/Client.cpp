@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:57:14 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 16:26:52 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/30 15:05:21 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ Client::Client()
 
 Client::~Client()
 	{
-		std::cout << "Client has destroyed" << std::endl;
+		// std::cout << "Client has destroyed" << std::endl;
 	}
 
 Client::Client(int fd, const std::string& ip) 

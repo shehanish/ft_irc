@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/29 17:45:20 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/30 15:04:39 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,19 @@
 #include "../includes/Channel.hpp"
 #include <arpa/inet.h>
 
+extern volatile sig_atomic_t signalreceived;
 
 // CONSTRUCTORS
 
 Server::Server()
 {
-	// std::cout << "Server Default constructor called" << std::endl;
-	_commands["JOIN"] = new JoinCmd();
+	serverInit();
 }
 
 Server::Server(char *port, const std::string& password) : _port(port), _password(password), _adlen(sizeof(_specs))
 {
 	std::cout << "Server starting... 🟢" << std::endl;
+	serverInit();
 	setUpSocket();
 }
 
@@ -53,8 +54,17 @@ Server::~Server()
 	std::cout << "Server shutting down 🔴" << std::endl;
 	for (std::map<std::string, Channel*>::iterator mit = _channels.begin(); mit != _channels.end(); mit++)
 		delete mit->second;
+	_channels.clear();
 	if (_serverfd >= 0)
 		close(_serverfd);
+	for (std::map<std::string, Command*>::iterator it = _commands.begin(); 
+         it != _commands.end(); ++it)
+        delete it->second;
+    _commands.clear();
+	for (std::map<int, Client*>::iterator cit = _clients.begin(); 
+         cit != _clients.end(); ++cit)
+        delete cit->second;
+	_clients.clear();
 }
 
 // GETTERS AND SETTERS
@@ -125,11 +135,18 @@ int Server::setUpSocket()
 }
 
 // use nc for testing
-//
-// The extracted message is parsed into the components <prefix>, <command> and list of parameters (<params>).
-// The Augmented BNF representation for this is: message = [ ":" prefix] SPACE [command] SPACE [args] /r/n
-// There can be a trailing (last argument) that contains spaces, it is preceded by ':'
-// Example ":Angel PRIVMSG Wiz :Hello are you receiving this message ?"
+
+/**
+ * @brief Parses the extracted message into the components <prefix>, <command> and list of parameters (<params>)..
+ *
+ * message = [ ":" prefix] SPACE [command] SPACE [args] /r/n
+ * There can be a trailing (last argument) that contains spaces, it is preceded by ':'
+ * Example ":Angel PRIVMSG Wiz :Hello are you receiving this message ?"
+ *
+ * @return int Returns true on success, or false when there are errors in the message.
+ *
+ * @note More detailed error handling still needs to be implemented
+ */
 bool Server::parse(std::string msg, Client *client)
 {
 	int len = msg.size();
@@ -224,6 +241,17 @@ bool Server::parse(std::string msg, Client *client)
 	return true;
 }
 
+void Server::serverInit()
+{
+	_commands["JOIN"] = new JoinCmd();
+	_commands["PART"] = new PartCmd();
+	_commands["PRIVMSG"] = new PrivMsgCmd();
+	_commands["KICK"] = new KickCmd();
+	_commands["INVITE"] = new InviteCmd();
+	_commands["TOPIC"] = new TopicCmd();
+	_commands["MODE"] = new ModeCmd();
+}
+
 /**
  * @brief Main server loop that accepts and handles incoming client connections using poll().
  *
@@ -233,7 +261,7 @@ bool Server::parse(std::string msg, Client *client)
  *
  * @note In a next step, this function can be refactored into smaller functions. 
  */
-
+ 
 void Server::loop()
 {
 	std::vector<pollfd>	poll_fds; // list of sockets we're watching for activity
@@ -243,7 +271,7 @@ void Server::loop()
 
 	poll_fds.push_back(server_poll_fd); // add server socket to poll list
 
-	while (1)
+	while (signalreceived == false)
 	{
 		if (poll(poll_fds.data(), poll_fds.size(), -1) < 0)
 		{

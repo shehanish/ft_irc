@@ -6,18 +6,19 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/22 16:25:13 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/30 14:38:10 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-# include "Declarations.hpp"
 # include <set>
 # include <string>
 # include <sys/socket.h>
 #include <iostream>
+
+class Channel;
 
 class Client
 {

@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/22 13:25:11 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/30 14:37:56 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #define CHANNEL_HPP
 
 # include <set>
-# include "Declarations.hpp"
 # include "Client.hpp"
 # include <string>
 # include <sys/socket.h>
