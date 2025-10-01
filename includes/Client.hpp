@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/29 18:26:14 by spitul           ###   ########.fr       */
+/*   Updated: 2025/09/30 20:34:35 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,10 @@ class Client
 			return NULL;
 		}
 		
-		void	sendMsg(Client &client, std::string &msg)	
+		void	sendMsg(const std::string &msg)	
 		{
 			if (!msg.empty())
-				send(client._fd, msg.c_str(), msg.size(), 0);
+				send(_fd, msg.c_str(), msg.size(), 0);
 		}
 			
 	private:
