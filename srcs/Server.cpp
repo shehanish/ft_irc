@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/30 15:04:39 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/30 15:23:16 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,7 +275,7 @@ void Server::loop()
 	{
 		if (poll(poll_fds.data(), poll_fds.size(), -1) < 0)
 		{
-			std::cerr << "Poll error: " << std::strerror(errno) << std::endl; // check if errno works here
+			std::cerr << "Poll error: " << std::strerror(errno) << std::endl;
 			continue;
 		}
 		

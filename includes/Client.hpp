@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/30 14:38:10 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/30 15:34:37 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,22 +35,23 @@ class Client
 		std::string _sendBuffer;
 		bool		_isAuthenticated;
 
+		Client();
+		Client(const Client& oth);
+		Client&	operator=(const Client& oth);
+
 	public:
 		// Constructors and Destructor
-		Client();
 		Client(int fd, const std::string& ip);
-		// Client(const Client& oth);
-		// Client&	operator=(const Client& oth);
 		~Client();
 		
-		//Getters
-		int		getFd() const;
+		// Getters
+		int			getFd() const;
 		std::string	getNick() const;
 		std::string getUserName() const;
 		std::string getRealName() const;
 		std::string getRecvBuffer() const;
 		std::string getSendBuffer() const;
-		bool	isAuthenticated() const;
+		bool		isAuthenticated() const;
 
 		// Setters
 		void 	setFd(int fd);
