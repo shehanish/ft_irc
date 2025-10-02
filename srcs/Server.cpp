@@ -6,7 +6,7 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/25 13:49:45 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/02 13:26:00 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -269,23 +269,6 @@ void	Server::handlePart(Client &client, const std::vector<std::string> &args)
 		
 }
 
-void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
-{
-	
-}
-
-void	Server::handleKick(Client &client, const std::vector<std::string> &args)
-{
-	
-}
-
-void	Server::handleInvite(Client &client, const std::vector<std::string> &args)
-{
-	
-}
-
-void	Server::handleTopic(Client &client, const std::vector<std::string> &args);
-void	Server::handleMode(Client &client, const std::vector<std::string> &args);
 
 void	Server::handlePass(Client &client, const std::vector<std::string> &args)
 {
@@ -333,20 +316,55 @@ void	Server::handleNick(Client &client, const std::vector <std::string> &args)
 	std::cout << "Nickname set to  " << nickname << std::endl;
 }
 
-void	Server::registerClient(Client &client)
+void Server::registerClient(Client &client)
 {
-	if(client.isRegistered())
-	{
-		return;
-	}
-	if(client.isAuthenticated() || client.getNick().empty() || client.getUserName().empty())
-	{
-		return;
-	}
-	client.setRegistered(true);
-	
+    if (client.isRegistered())
+        return;
+
+    // Needs ALL 3: authenticated + nick + username
+    if (!client.isAuthenticated() || client.getNick().empty() || client.getUserName().empty())
+        return;
+
+    client.setRegistered(true);
+
+    // Send welcome numerics (later)
+    std::cout << "Client registered: " 
+              << client.getNick() << "!" << client.getUserName() << std::endl;
 }
-void	Server::handleUser(Client &cleint, const std::vector <std::string> &args)
+
+
+void Server::handleUser(Client &client, const std::vector<std::string> &args)
 {
-	
+    if (args.size() < 4)
+    {
+        std::cerr << "461 ERR_NEEDMOREPARAMS (USER)" << std::endl;
+        return;
+    }
+
+    if (!client.getUserName().empty())
+    {
+        std::cerr << "462 ERR_ALREADYREGISTRED (USER)" << std::endl;
+        return;
+    }
+
+    std::string username = args[0];
+    std::string realname = args[3]; // assuming it's parsed correctly
+
+    client.setUserName(username);
+    client.setRealName(realname);
+
+    std::cout << "User set: " << username << " (" << realname << ")" << std::endl;
+
+    // Try to complete registration (PASS + NICK + USER must be done)
+    registerClient(client);
 }
+
+/*
+PASS must succeed → client.setIsAuthenticated(true).
+
+NICK must succeed → client.setNick(nickname).
+
+USER must succeed → client.setUserName(...), client.setRealName(...).
+
+After each of NICK or USER, call registerClient(client).
+*/

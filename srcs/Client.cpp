@@ -6,7 +6,7 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:57:14 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/07 15:38:32 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/02 13:31:34 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,3 +130,20 @@ void Client::setIsAuthenticated(bool value)
     _isAuthenticated = value;
 }
 
+ // Message handling
+ 
+void Client::appendToSendBuffer(const std::string& data) 
+{
+    _sendBuffer += data;
+}
+
+void Client::clearSendBuffer() 
+{
+    _sendBuffer.clear();
+}
+
+void Client::sendMsg(Client &client, const std::string &msg) 
+{
+    std::string toSend = msg + "\r\n";
+    ::send(client.getFd(), toSend.c_str(), toSend.size(), 0);
+}
