@@ -6,12 +6,15 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 13:26:00 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/02 15:21:05 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Server.hpp"
 #include "../includes/Channel.hpp"
+
+#include "../includes/Channel.hpp"
+#include <arpa/inet.h>
 
 
 // CONSTRUCTORS
@@ -19,6 +22,7 @@
 Server::Server()
 {
 	// std::cout << "Server Default constructor called" << std::endl;
+	_commands["JOIN"] = new JoinCmd();
 	_commands["JOIN"] = new JoinCmd();
 }
 
@@ -52,6 +56,8 @@ Server::~Server()
 	std::cout << "Server shutting down 🔴" << std::endl;
 	for (std::map<std::string, Channel*>::iterator mit = _channels.begin(); mit != _channels.end(); mit++)
 		delete mit->second;
+	for (std::map<std::string, Channel*>::iterator mit = _channels.begin(); mit != _channels.end(); mit++)
+		delete mit->second;
 	if (_serverfd >= 0)
 		close(_serverfd);
 }
@@ -73,7 +79,7 @@ int Server::getServerfd() const
 	return (_serverfd);
 }
 
-std::map<int, Client>	& Server::getClients()
+std::map<int, Client*>	& Server::getClients()
 {
 	return (_clients);
 }
@@ -123,6 +129,106 @@ int Server::setUpSocket()
 	return (0);
 }
 
+// use nc for testing
+//
+// The extracted message is parsed into the components <prefix>, <command> and list of parameters (<params>).
+// The Augmented BNF representation for this is: message = [ ":" prefix] SPACE [command] SPACE [args] /r/n
+// There can be a trailing (last argument) that contains spaces, it is preceded by ':'
+// Example ":Angel PRIVMSG Wiz :Hello are you receiving this message ?"
+bool Server::parse(std::string msg, Client *client)
+{
+	int len = msg.size();
+	if (len == 0)
+		return true; // should be "silently ignored"
+	else if (len > 512)
+		return false; // see rules	
+
+	size_t pos = 0;
+	
+    // trim /r/n
+	size_t end = msg.find_last_not_of("\r\n");
+	if (end == std::string::npos)
+    	return true; // String was only \r\n characters
+	msg = msg.substr(0, end + 1);
+	
+	// extract prefix
+	if (msg[0] == ':')
+	{
+		size_t space_pos = msg.find(' ');
+		if (space_pos == std::string::npos)
+			return false; // : without prefix
+		std::string prefix = msg.substr(1, space_pos - 1);
+		std::cout << "The prefix is: " << prefix << std::endl;
+		pos = space_pos;
+		// check whether prefix is valid or do whatever is necessary
+	}
+	while (pos < msg.size() && msg[pos] == ' ')
+		pos++;
+	if (pos >= msg.size())
+		return false; // no command found
+	
+	// extract command
+	size_t cmd_start = pos;
+    size_t cmd_end = msg.find(' ', cmd_start);
+	
+	std::string cmd;
+    if (cmd_end == std::string::npos)
+        cmd = msg.substr(cmd_start);
+    else
+	{
+        cmd = msg.substr(cmd_start, cmd_end - cmd_start);
+	}
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper); // convert to capitals
+	std::cout << "The command is: " << cmd << std::endl;
+
+	// look up command
+	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
+	if (it == _commands.end())
+	{
+		std::cout << "Command has not yet been implemented" << std::endl; // TODO remove this and uncomment following line
+		// return (false); // unknown or invalid command
+	}
+	
+	pos = cmd_end;
+
+	
+	// parse args
+	std::vector<std::string> args;
+    while (pos < msg.size())	
+	{
+		while (pos < msg.size() && msg[pos] == ' ')
+			pos++;
+		if (msg[pos] == ':')
+		{
+			std::string newarg = msg.substr(pos); // include the ':'
+			args.push_back(newarg);
+			break;
+		}
+		else
+		{
+			size_t next_space = msg.find(' ', pos);
+			if (next_space == std::string::npos)
+            {
+                args.push_back(msg.substr(pos));
+                break;
+            }
+			std::string nextarg = msg.substr(pos, next_space - pos);
+			args.push_back(nextarg);
+			pos = next_space;
+		}
+	}
+	// print args
+	for (size_t i = 0; i < args.size(); i++)
+	{
+		std::cout << "Arg " << i + 1 << ": " << args[i] << std::endl;
+	}
+	
+	// pass to execute
+	// it->second->execute(*this, *client, args);
+	(void)*client; // TODO change this and uncomment the above
+	return true;
+}
+
 /**
  * @brief Main server loop that accepts and handles incoming client connections using poll().
  *
@@ -168,7 +274,10 @@ void Server::loop()
 					send(client_fd, welcome.c_str(), welcome.length(), 0);
 					pollfd newclient_pollfd = {client_fd, POLLIN | POLLOUT, 0};
 					poll_fds.push_back(newclient_pollfd);
-					// add to client struct as well
+					// Cast to sockaddr_in to access sin_addr (choosing IPv4 here!)
+					struct sockaddr_in *addr_in = (struct sockaddr_in *)&client_addr;
+					std::string client_ip = inet_ntoa(addr_in->sin_addr);
+					_clients[client_fd] = new Client(client_fd, client_ip);
 				}
 				else // existing client sends message
 				{
@@ -180,7 +289,8 @@ void Server::loop()
 					{
 						std::string msg(message, bytesnum);
 						std::cout << "Received from client: " << msg;
-						// here parsing needs to happen
+						std::map<int, Client*>::iterator it = _clients.find(poll_fds[i].fd);
+						parse(msg, it->second);
 					}
 					else if (bytesnum == 0)
 					{
@@ -368,3 +478,100 @@ USER must succeed → client.setUserName(...), client.setRealName(...).
 
 After each of NICK or USER, call registerClient(client).
 */
+
+Channel*	Server::getChannel(const std::string &channel)
+{
+	std::map<std::string, Channel*>::iterator	mit = _channels.find(channel);
+		if (mit != _channels.end())
+			return mit->second;
+	return NULL;
+}
+
+Channel*	Server::createChannel(const std::string &channel, Client &creator)
+{
+	if (getChannel(channel) != NULL)
+		return getChannel(channel);
+		
+	Channel	*newChannel = new Channel(channel, &creator);
+	_channels[channel] = newChannel;
+	return newChannel;
+}
+
+void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
+{
+	Channel	*channel;
+	
+	if (args.empty())
+		return; //message
+	if (client.getNbChannel() > MAX_CHANNELS)
+		return; //send message
+	channel = getChannel(args[0]);
+	if (channel == NULL)
+	{
+		channel = createChannel(args[0], client);
+	}
+	else
+	{
+		if (channel->hasKey() && !channel->checkKey(args[1]))
+			return;
+		if (!channel->isInvited(client))
+			return;
+		channel->addUser(client);
+		client.addChannel();
+		//send messages + topic
+	}
+}
+
+void	Server::handlePart(Client &client, const std::vector<std::string> &args)
+{
+	if (args.empty())
+		return;
+	Channel	*channel;
+	std::vector<std::string>::const_iterator	it = args.begin();
+	for (; it != args.end(); ++it)
+	{
+		channel = getChannel(*it);
+		if (!channel->isMember(client))
+		{
+			//send msg
+			continue;
+		}
+		channel->delUser(client);
+		if (channel->isOperator(client))
+			channel->delOperator(client);
+		if (channel->isInviteOnly())
+			channel->delInvitation(client);
+		//send part message
+	}
+		
+}
+
+void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
+{
+	(void)client;
+	(void)args;
+}
+
+void	Server::handleKick(Client &client, const std::vector<std::string> &args)
+{
+	(void)client;
+	(void)args;
+}
+
+void	Server::handleInvite(Client &client, const std::vector<std::string> &args)
+{
+	(void)client;
+	(void)args;	
+}
+
+void	Server::handleTopic(Client &client, const std::vector<std::string> &args)
+{
+	(void)client;
+	(void)args;
+}
+
+void	Server::handleMode(Client &client, const std::vector<std::string> &args)
+{
+	(void)client;
+	(void)args;
+}

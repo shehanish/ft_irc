@@ -6,7 +6,7 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:57:14 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 14:16:06 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/02 15:32:16 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,31 +31,32 @@ Client::Client(int fd, const std::string& ip)
 		_sendBuffer(),
 		_isAuthenticated(false)	{};
 
-Client::Client(const Client& oth)
-		:_fd(oth._fd),
-		_ipAddress(oth._ipAddress),
-		_nick(oth._nick),
-		_username(oth._username),
-		_realname(oth._realname),
-		_recvBuffer(oth._recvBuffer),
-		_sendBuffer(oth._sendBuffer),
-		_isAuthenticated(oth._isAuthenticated) {};
+// maybe it is too tricky to add a copying possibility? two similar fd's might be a problem
+// Client::Client(const Client& oth) 
+// 		:_fd(oth._fd),
+// 		_ipAddress(oth._ipAddress),
+// 		_nick(oth._nick),
+// 		_username(oth._username),
+// 		_realname(oth._realname),
+// 		_recvBuffer(oth._recvBuffer),
+// 		_sendBuffer(oth._sendBuffer),
+// 		_isAuthenticated(oth._isAuthenticated) {};
 
-Client&	Client::operator=(const Client& oth) 
-{
-	if(this != &oth)
-	{
-		_fd = oth._fd;
-		_ipAddress = oth._ipAddress;
-		_nick = oth._nick;
-		_username = oth._username;
-		_realname = oth._realname;
-		_recvBuffer = oth._recvBuffer;
-		_sendBuffer = oth._sendBuffer;
-		_isAuthenticated = oth._isAuthenticated;
-	}
-	return *this;
-}
+// Client&	Client::operator=(const Client& oth) 
+// {
+// 	if(this != &oth)
+// 	{
+// 		_fd = oth._fd;
+// 		_ipAddress = oth._ipAddress;
+// 		_nick = oth._nick;
+// 		_username = oth._username;
+// 		_realname = oth._realname;
+// 		_recvBuffer = oth._recvBuffer;
+// 		_sendBuffer = oth._sendBuffer;
+// 		_isAuthenticated = oth._isAuthenticated;
+// 	}
+// 	return *this;
+// }
 
 //Getters 
 

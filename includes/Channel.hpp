@@ -6,15 +6,18 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/22 16:39:39 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/02 15:29:35 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
-#include <set>
-#include "Server.hpp"
+# include <set>
+# include "Declarations.hpp"
+# include "Client.hpp"
+# include <string>
+# include <sys/socket.h>
 
 class	Channel
 {

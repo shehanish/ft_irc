@@ -6,12 +6,13 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 15:30:19 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/18 15:36:42 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/02 15:30:43 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <cstdlib>
+#include "../includes/Declarations.hpp"
 #include "../includes/Server.hpp"
 #include "../includes/Client.hpp"
 #include "Command.hpp"

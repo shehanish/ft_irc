@@ -6,14 +6,17 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 14:14:54 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/02 15:23:35 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include <string>
+# include "Declarations.hpp"
+# include <set>
+# include <string>
+# include <sys/socket.h>
 #include <iostream>
 #include <set>
 #include <sys/types.h>
