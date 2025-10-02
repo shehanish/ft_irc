@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 19:07:37 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/02 19:26:24 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -356,9 +356,9 @@ Channel*	Server::createChannel(const std::string &channel, Client &creator)
 Client*	Server::getUser(const std::string &nick)
 {
 	std::map<int, Client*>::iterator	mit = _clients.begin();
-	for (mit; mit != _clients.end(); mit ++)
+	for (; mit != _clients.end(); mit ++)
 	{
-		if (mit->second->getName() == nick)
+		if (mit->second->getNick() == nick)
 			return mit->second;
 	}
 	return NULL;
@@ -367,8 +367,8 @@ Client*	Server::getUser(const std::string &nick)
 void	Server::broadcastMsg(Client &source, Channel *channel, const std::string &msg)
 {
 	std::set<Client*>::iterator	sit = channel->getMembers().begin();
-	for (sit; sit != channel->getMembers().end(); sit++)
-		(*sit)->sendMsg(msg); //send msg needs to be adapted to also send prefix
+	for (; sit != channel->getMembers().end(); sit++)
+		(*sit)->sendMsg(source, msg); //send msg needs to be adapted to also send prefix // TODO check i added source here
 }
 
 void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
@@ -440,7 +440,7 @@ void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
 			Client	*target = getUser(*it);
 			if (target == NULL)
 				{} //401 ERR_NOSUCHNICK "<nickname> :No such nick/channel"
-			client.sendMsg(*msg);
+			client.sendMsg(client, *msg);
 		}
 	}
 }
@@ -475,82 +475,6 @@ void	Server::handleKick(Client &client, const std::vector<std::string> &args)
 		
 }
 
-void	Server::handleInvite(Client &client, const std::vector<std::string> &args)
-{
-	
-}
-
-void	Server::handleTopic(Client &client, const std::vector<std::string> &args);
-void	Server::handleMode(Client &client, const std::vector<std::string> &args);
-
-
-Channel*	Server::getChannel(const std::string &channel)
-{
-	std::map<std::string, Channel*>::iterator	mit = _channels.find(channel);
-		if (mit != _channels.end())
-			return mit->second;
-	return NULL;
-}
-
-Channel*	Server::createChannel(const std::string &channel, Client &creator)
-{
-	if (getChannel(channel) != NULL)
-		return getChannel(channel);
-		
-	Channel	*newChannel = new Channel(channel, &creator);
-	_channels[channel] = newChannel;
-	return newChannel;
-}
-
-void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
-{
-	Channel	*channel;
-	
-	if (args.empty())
-		return; //message
-	if (client.getNbChannel() > MAX_CHANNELS)
-		return; //send message
-	channel = getChannel(args[0]);
-	if (channel == NULL)
-	{
-		channel = createChannel(args[0], client);
-	}
-	else
-	{
-		if (channel->hasKey() && !channel->checkKey(args[1]))
-			return;
-		if (!channel->isInvited(client))
-			return;
-		channel->addUser(client);
-		client.addChannel();
-		//send messages + topic
-	}
-}
-
-void	Server::handlePart(Client &client, const std::vector<std::string> &args)
-{
-	if (args.empty())
-		return;
-	Channel	*channel;
-	std::vector<std::string>::const_iterator	it = args.begin();
-	for (; it != args.end(); it ++)
-	{
-		channel = getChannel(*it);
-		if (!channel->isMember(client))
-		{
-			//send msg
-			continue;
-		}
-		channel->delUser(client);
-		if (channel->isOperator(client))
-			channel->delOperator(client);
-		if (channel->isInviteOnly())
-			channel->delInvitation(client);
-		//send part message
-	}
-}
-
-
 void	Server::handlePass(Client &client, const std::vector<std::string> &args)
 {
 	if(client.isAuthenticated())
@@ -570,6 +494,7 @@ void	Server::handlePass(Client &client, const std::vector<std::string> &args)
 	}
 	client.setIsAuthenticated(true);
 }
+
 bool	Server::isNickTaken(const std::string &nickname) const
 {
 	for(std::map<int, Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
@@ -579,6 +504,7 @@ bool	Server::isNickTaken(const std::string &nickname) const
 	}
 	return false;
 }
+
 void	Server::handleNick(Client &client, const std::vector <std::string> &args)
 {
 	if(args.empty())
@@ -649,18 +575,6 @@ USER must succeed → client.setUserName(...), client.setRealName(...).
 
 After each of NICK or USER, call registerClient(client).
 */
-
-void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
-{
-	(void)client;
-	(void)args;
-}
-
-void	Server::handleKick(Client &client, const std::vector<std::string> &args)
-{
-	(void)client;
-	(void)args;
-}
 
 void	Server::handleInvite(Client &client, const std::vector<std::string> &args)
 {

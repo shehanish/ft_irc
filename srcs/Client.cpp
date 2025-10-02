@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:57:14 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 18:55:58 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/02 19:13:04 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,14 @@ std::string	Client::getSendBuffer() const
 {
 	return _sendBuffer;
 }
+
+const std::string	*Client::getMsg(const std::vector<std::string> &args)
+{
+	if (!args.empty() && args.back()[0] == ':')
+		return	&(args.back());
+	return NULL;
+}
+		
 
 bool	Client::isAuthenticated() const
 {
