@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 19:26:24 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/02 19:30:54 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -402,7 +402,7 @@ void	Server::handlePart(Client &client, const std::vector<std::string> &args)
 		return;
 	Channel	*channel;
 	std::vector<std::string>::const_iterator	it = args.begin();
-	for (it; it != args.end(); it ++)
+	for (; it != args.end(); it ++)
 	{
 		channel = getChannel(*it);
 		if (!channel->isMember(client))
@@ -455,8 +455,8 @@ void	Server::handleKick(Client &client, const std::vector<std::string> &args)
 	
 	const std::string *msg = client.getMsg(args);
 	
-	int	i = 0;
-	int	j = 0;
+	size_t	i = 0;
+	size_t	j = 0;
 	while (i < channels.size() && j < users.size())
 	{
 		channels[i++]->delUser(*(users[j++]));
@@ -472,7 +472,7 @@ void	Server::handleKick(Client &client, const std::vector<std::string> &args)
 		while (i < channels.size())
 			channels[i]->delUser(*(users[j]));
 	}
-		
+	(void)msg; // TODO change this
 }
 
 void	Server::handlePass(Client &client, const std::vector<std::string> &args)

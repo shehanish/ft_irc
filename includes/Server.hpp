@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 19:16:41 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/02 19:34:21 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,6 @@ class Server
 		void	handleMode(Client &client, const std::vector<std::string> &args);
 		void	handlePass(Client &client, const std::vector<std::string> &args);
 
-
 		bool	isNickTaken(const std::string &nickname) const;
 		void	registerClient(Client &client);
 		void 	handleUser(Client &client, const std::vector<std::string> &args);
@@ -96,7 +95,6 @@ class Server
 		bool parse(std::string msg, Client *client);
 		void cleanup();
 		void	broadcastMsg(Client &client, Channel *channel, const std::string &msg);
-
 };
 
 #endif

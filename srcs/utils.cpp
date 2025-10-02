@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/29 18:02:35 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/02 19:21:48 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/02 19:31:08 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 const std::vector<Client*>	Server::getUserArguments(const std::vector<std::string> &args)
 {
 	std::vector<Client*>	users;
-	for(int	i = 0; i < args.size(); i++)
+	for(size_t	i = 0; i < args.size(); i++)
 	{
 		if (args[i][0] != '#' && args[i][0] != ':')
 		{
@@ -32,7 +32,7 @@ const std::vector<Client*>	Server::getUserArguments(const std::vector<std::strin
 const std::vector<Channel*>	Server::getChanArguments(const std::vector<std::string> &args)
 {
 	std::vector<Channel*>	channels;
-	for(int	i = 0; i < args.size(); i++)
+	for(size_t	i = 0; i < args.size(); i++)
 	{
 		if (args[i][0] == '#')
 		{
