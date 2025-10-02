@@ -3,25 +3,65 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 15:30:19 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/08/12 17:04:21 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/09/18 15:36:42 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <cstdlib>
 #include "../includes/Server.hpp"
+#include "../includes/Client.hpp"
+#include "Command.hpp"
 
 int main (int argc, char** argv) 
 {
-    if (argc != 3) 
-    {
-        std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
-        return (1);
-    }
-    Server server(argv[1], argv[2]);
-    server.loop();
+    
+    (void)argc;
+    (void)argv;
+
+    Command cmd;
+    
+    cmd.parse_message("NICK Shehani");
+    
+    std::cout << "COmmand: " << cmd.getCommandName() << std::endl;
+
+    
+    
+    // std::vector<std::string> response;
+
+    // response.push_back("Welcome to the server!");
+    // response.push_back("Your nick name has been set!");
+    // response.push_back("You joined #genaral");
+
+    // for (size_t i = 0; i < response.size(); ++i)
+    // {
+    //     std::cout << response[i] << std::endl;
+    // }
+    
     return (0);
+    
+    // Client client(42, "127.0.0.1");
+    
+    // client.setNick("Shehani");
+    // client.setUserName("Shehani123");
+    // client.setRealName("Shehai Karunathilake");
+    // client.setRecvBuffer("Incomin data..");
+    // client.setSendBuffer("Outgoing data..");
+
+    // std::cout << "fd " << client.getFd() <<std::endl;
+    // std::cout << "Nick " << client.getNick() << std::endl;
+    // std::cout << "User Name " << client.getUserName() << std::endl;
+    // std::cout << "Real Name " << client.getRealName() << std::endl;
+    // std::cout << "RecvBuffer " << client.getRecvBuffer() << std::endl;
+    // std::cout << "SendBuffer " << client.getSendBuffer() << std::endl;
+    
+    
+    // std::cout << "Client created!" << std::endl;
+    // client.setNick("NewNick");
+    // std::cout << "Updated Nick: " << client.getNick() << std::endl;
+
+    // return (0);
 }
