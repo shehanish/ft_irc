@@ -6,13 +6,11 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 17:47:57 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/02 18:57:30 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Server.hpp"
-#include "../includes/Channel.hpp"
-
 #include "../includes/Channel.hpp"
 #include <arpa/inet.h>
 
@@ -386,7 +384,7 @@ void	Server::handlePart(Client &client, const std::vector<std::string> &args)
 		return;
 	Channel	*channel;
 	std::vector<std::string>::const_iterator	it = args.begin();
-	for (it; it != args.end(); it ++)
+	for (; it != args.end(); it ++)
 	{
 		channel = getChannel(*it);
 		if (!channel->isMember(client))
@@ -401,7 +399,6 @@ void	Server::handlePart(Client &client, const std::vector<std::string> &args)
 			channel->delInvitation(client);
 		//send part message
 	}
-		
 }
 
 
@@ -426,9 +423,9 @@ void	Server::handlePass(Client &client, const std::vector<std::string> &args)
 }
 bool	Server::isNickTaken(const std::string &nickname) const
 {
-	for(std::map<int, Client>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
+	for(std::map<int, Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		if (it->second.getNick() == nickname)
+		if (it->second->getNick() == nickname)
 			return true;
 	}
 	return false;
@@ -503,73 +500,6 @@ USER must succeed → client.setUserName(...), client.setRealName(...).
 
 After each of NICK or USER, call registerClient(client).
 */
-
-Channel*	Server::getChannel(const std::string &channel)
-{
-	std::map<std::string, Channel*>::iterator	mit = _channels.find(channel);
-		if (mit != _channels.end())
-			return mit->second;
-	return NULL;
-}
-
-Channel*	Server::createChannel(const std::string &channel, Client &creator)
-{
-	if (getChannel(channel) != NULL)
-		return getChannel(channel);
-		
-	Channel	*newChannel = new Channel(channel, &creator);
-	_channels[channel] = newChannel;
-	return newChannel;
-}
-
-void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
-{
-	Channel	*channel;
-	
-	if (args.empty())
-		return; //message
-	if (client.getNbChannel() > MAX_CHANNELS)
-		return; //send message
-	channel = getChannel(args[0]);
-	if (channel == NULL)
-	{
-		channel = createChannel(args[0], client);
-	}
-	else
-	{
-		if (channel->hasKey() && !channel->checkKey(args[1]))
-			return;
-		if (!channel->isInvited(client))
-			return;
-		channel->addUser(client);
-		client.addChannel();
-		//send messages + topic
-	}
-}
-
-void	Server::handlePart(Client &client, const std::vector<std::string> &args)
-{
-	if (args.empty())
-		return;
-	Channel	*channel;
-	std::vector<std::string>::const_iterator	it = args.begin();
-	for (; it != args.end(); ++it)
-	{
-		channel = getChannel(*it);
-		if (!channel->isMember(client))
-		{
-			//send msg
-			continue;
-		}
-		channel->delUser(client);
-		if (channel->isOperator(client))
-			channel->delOperator(client);
-		if (channel->isInviteOnly())
-			channel->delInvitation(client);
-		//send part message
-	}
-		
-}
 
 void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
 {

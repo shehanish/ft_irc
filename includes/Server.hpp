@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 17:44:58 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/02 18:04:07 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,9 +72,16 @@ class Server
 		void	handlePart(Client &client, const std::vector<std::string> &args);
 		void	handlePrivMsg(Client &client, const std::vector<std::string> &args);
 		void	handleKick(Client &client, const std::vector<std::string> &args);
+		void	handleNick(Client &client, const std::vector<std::string> &args);
 		void	handleInvite(Client &client, const std::vector<std::string> &args);
 		void	handleTopic(Client &client, const std::vector<std::string> &args);
 		void	handleMode(Client &client, const std::vector<std::string> &args);
+		void	handlePass(Client &client, const std::vector<std::string> &args);
+
+
+		bool	isNickTaken(const std::string &nickname) const;
+		void	registerClient(Client &client);
+		void 	handleUser(Client &client, const std::vector<std::string> &args);
 		
 		// MEMBER FUNCTIONS
 		

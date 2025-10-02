@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:57:14 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 17:45:09 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/02 18:55:58 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,4 +147,25 @@ void Client::sendMsg(Client &client, const std::string &msg)
 {
     std::string toSend = msg + "\r\n";
     ::send(client.getFd(), toSend.c_str(), toSend.size(), 0);
+}
+
+void Client::addUserChannel(Channel* channel) {
+    if (!channel) return;
+    _channels.insert(channel);  // std::set ignores duplicates automatically
+}
+
+// Remove a channel from the client's set
+void Client::delUserChannel(Channel* channel) {
+    if (!channel) return;
+    _channels.erase(channel);  // safe even if channel is not in the set
+}
+
+// Return the number of channels this client is in
+int Client::getNbChannel() const {
+    return static_cast<int>(_channels.size());
+}
+
+void Client::addChannel()
+{
+	_nb_chan++;
 }
