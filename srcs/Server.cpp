@@ -6,11 +6,13 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/30 15:23:16 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/02 17:47:57 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Server.hpp"
+#include "../includes/Channel.hpp"
+
 #include "../includes/Channel.hpp"
 #include <arpa/inet.h>
 
@@ -334,6 +336,173 @@ void Server::loop()
 		}
 	}
 }
+
+Channel*	Server::getChannel(const std::string &channel)
+{
+	std::map<std::string, Channel*>::iterator	mit = _channels.find(channel);
+		if (mit != _channels.end())
+			return mit->second;
+	return NULL;
+}
+
+Channel*	Server::createChannel(const std::string &channel, Client &creator)
+{
+	if (getChannel(channel) != NULL)
+		return getChannel(channel);
+		
+	Channel	*newChannel = new Channel(channel, &creator);
+	_channels[channel] = newChannel;
+	return newChannel;
+}
+
+void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
+{
+	Channel	*channel;
+	
+	if (args.empty())
+		return; //message
+	if (client.getNbChannel() > MAX_CHANNELS)
+		return; //send message
+	channel = getChannel(args[0]);
+	if (channel == NULL)
+	{
+		channel = createChannel(args[0], client);
+	}
+	else
+	{
+		if (channel->hasKey() && !channel->checkKey(args[1]))
+			return;
+		if (!channel->isInvited(client))
+			return;
+		channel->addUser(client);
+		client.addChannel();
+		//send messages + topic
+	}
+}
+
+void	Server::handlePart(Client &client, const std::vector<std::string> &args)
+{
+	if (args.empty())
+		return;
+	Channel	*channel;
+	std::vector<std::string>::const_iterator	it = args.begin();
+	for (it; it != args.end(); it ++)
+	{
+		channel = getChannel(*it);
+		if (!channel->isMember(client))
+		{
+			//send msg
+			continue;
+		}
+		channel->delUser(client);
+		if (channel->isOperator(client))
+			channel->delOperator(client);
+		if (channel->isInviteOnly())
+			channel->delInvitation(client);
+		//send part message
+	}
+		
+}
+
+
+void	Server::handlePass(Client &client, const std::vector<std::string> &args)
+{
+	if(client.isAuthenticated())
+	{
+		std::cerr << "462 ERR_ALREADYREGISTRED" << std::endl;
+		return; 
+	}
+	if(args.empty())
+	{
+		std::cerr << "461 ERR_NEEDMOREPARAMS" <<std::endl;
+		return;
+	}
+	if(args[0] != _password)
+	{
+		std::cerr << "464 ERR_PASSWDMISMATCH" << std::endl;
+		return;
+	}
+	client.setIsAuthenticated(true);
+}
+bool	Server::isNickTaken(const std::string &nickname) const
+{
+	for(std::map<int, Client>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		if (it->second.getNick() == nickname)
+			return true;
+	}
+	return false;
+}
+void	Server::handleNick(Client &client, const std::vector <std::string> &args)
+{
+	if(args.empty())
+	{
+		std::cerr << "Empty arguments!" << std::endl;
+		return;
+	}
+	std::string nickname = args[0];
+	
+	if(isNickTaken(nickname))
+	{
+		std::cerr << "Nick name has already taken!" << std::endl;
+		return;
+	}
+	client.setNick(nickname);
+	std::cout << "Nickname set to  " << nickname << std::endl;
+}
+
+void Server::registerClient(Client &client)
+{
+    if (client.isRegistered())
+        return;
+
+    // Needs ALL 3: authenticated + nick + username
+    if (!client.isAuthenticated() || client.getNick().empty() || client.getUserName().empty())
+        return;
+
+    client.setRegistered(true);
+
+    // Send welcome numerics (later)
+    std::cout << "Client registered: " 
+              << client.getNick() << "!" << client.getUserName() << std::endl;
+}
+
+
+void Server::handleUser(Client &client, const std::vector<std::string> &args)
+{
+    if (args.size() < 4)
+    {
+        std::cerr << "461 ERR_NEEDMOREPARAMS (USER)" << std::endl;
+        return;
+    }
+
+    if (!client.getUserName().empty())
+    {
+        std::cerr << "462 ERR_ALREADYREGISTRED (USER)" << std::endl;
+        return;
+    }
+
+    std::string username = args[0];
+    std::string realname = args[3]; // assuming it's parsed correctly
+
+    client.setUserName(username);
+    client.setRealName(realname);
+
+    std::cout << "User set: " << username << " (" << realname << ")" << std::endl;
+
+    // Try to complete registration (PASS + NICK + USER must be done)
+    registerClient(client);
+}
+
+/*
+PASS must succeed → client.setIsAuthenticated(true).
+
+NICK must succeed → client.setNick(nickname).
+
+USER must succeed → client.setUserName(...), client.setRealName(...).
+
+After each of NICK or USER, call registerClient(client).
+*/
 
 Channel*	Server::getChannel(const std::string &channel)
 {

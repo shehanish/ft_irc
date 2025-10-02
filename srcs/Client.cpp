@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:57:14 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/09/30 15:05:21 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/02 17:45:09 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,3 +131,20 @@ void Client::setIsAuthenticated(bool value)
     _isAuthenticated = value;
 }
 
+ // Message handling
+ 
+void Client::appendToSendBuffer(const std::string& data) 
+{
+    _sendBuffer += data;
+}
+
+void Client::clearSendBuffer() 
+{
+    _sendBuffer.clear();
+}
+
+void Client::sendMsg(Client &client, const std::string &msg) 
+{
+    std::string toSend = msg + "\r\n";
+    ::send(client.getFd(), toSend.c_str(), toSend.size(), 0);
+}
