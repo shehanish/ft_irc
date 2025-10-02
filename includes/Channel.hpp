@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/02 17:44:48 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/02 19:25:46 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,10 @@ class	Channel
 		void		delInvitation(Client &client);
 		LimitMode	hasLimit();
 		void		setLimit(int &limit);
+
+		const std::set<Client*>& getMembers() const {
+        return _members;
+    }
 		
 	private:
 	

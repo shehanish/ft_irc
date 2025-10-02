@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 18:45:16 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/02 19:22:37 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,11 @@
 # include <set>
 # include <string>
 # include <sys/socket.h>
-#include <iostream>
-#include <set>
-#include <sys/types.h>
-#include <sys/socket.h>
+# include <iostream>
+# include <set>
+# include <vector>
+# include <sys/types.h>
+# include <sys/socket.h>
 
 class Channel; // Forward declaration
 
@@ -68,6 +69,8 @@ class Client
 		void setRecvBuffer(const std::string& recvbuffer);
 		void setSendBuffer(const std::string& sendbuffer);
 		void setIsAuthenticated(bool value);
+		const std::string	*getMsg(const std::vector<std::string> &args);
+
 
 		// Channel management
 		void addUserChannel(Channel *channel);

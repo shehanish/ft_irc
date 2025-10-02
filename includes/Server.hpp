@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 18:04:07 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/02 19:16:41 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,8 @@ class Server
 		std::map<int, Client*>	&getClients();
 		Channel					*getChannel(const std::string &channel);
 		Channel					*createChannel(const std::string &channel, Client &creator);
-
+		Client					*getUser(const std::string &nick);
+		
 		// COMMANDS HANDLERS
 		
 		void	handleJoin(Client &client, const std::vector<std::string> &args);
@@ -83,12 +84,19 @@ class Server
 		void	registerClient(Client &client);
 		void 	handleUser(Client &client, const std::vector<std::string> &args);
 		
+		// HELPER FUNCTIONS
+
+		const std::vector<Client*>	getUserArguments(const std::vector<std::string> &args);
+		const std::vector<Channel*>	getChanArguments(const std::vector<std::string> &args);		
+		
 		// MEMBER FUNCTIONS
 		
 		void serverInit();
 		void loop(); // main loop
 		bool parse(std::string msg, Client *client);
 		void cleanup();
+		void	broadcastMsg(Client &client, Channel *channel, const std::string &msg);
+
 };
 
 #endif

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/02 15:18:25 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/02 19:18:08 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ Channel::~Channel()
 
 void	Channel::addUser(Client &user)
 {
-	if (_limit.active && static_cast<size_t>(_limit.value) <= _members.size())
+	if (_limit.active && _limit.value >= _members.size())
 	{
 		const std::string	msg = "Channel limit reached"; //check IRC docs
 		send(user.getFd(), msg.c_str(), msg.size(), 0);
