@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/03 18:38:42 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/03 18:40:52 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -484,10 +484,7 @@ void	Server::handlePart(Client &client, const std::vector<std::string> &args)
 			continue;
 		}
 		channel->delUser(client);
-		if (channel->isOperator(client))
-			channel->delOperator(client);
-		if (channel->isInviteOnly())
-			channel->delInvitation(client);
+		
 		//send part message
 	}
 		
