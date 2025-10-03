@@ -3,21 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/02 15:29:35 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/03 18:26:51 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
-# include <set>
-# include "Declarations.hpp"
-# include "Client.hpp"
-# include <string>
-# include <sys/socket.h>
+#include <set>
+#include "Server.hpp"
 
 class	Channel
 {
@@ -48,6 +45,7 @@ class	Channel
 		void		delOperator(Client &user);
 		bool		isOperator(Client &user);
 		bool		isMember(Client &user);
+		std::set<Client*>	getMembers();
 		std::string	getTopic();
 		void		setTopic(std::string &newTopic);
 		void		restrictTopic();

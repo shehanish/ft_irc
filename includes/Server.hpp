@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 15:28:28 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/03 18:44:32 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,9 @@ class Server
 
 		Channel	*getChannel(const std::string &channel);
 		Channel	*createChannel(const std::string &channel, Client &creator);
-
+		
+		Client	*getUser(const std::string &nick);
+		
 		// COMMANDS HANDLERS
 		
 		void	handleJoin(Client &client, const std::vector<std::string> &args);
@@ -77,10 +79,16 @@ class Server
 		void	handleTopic(Client &client, const std::vector<std::string> &args);
 		void	handleMode(Client &client, const std::vector<std::string> &args);
 		
+		// HELPER FUNCTIONS
+
+		const std::vector<Client*>	getUserArguments(const std::vector<std::string> &args);
+		const std::vector<Channel*>	getChanArguments(const std::vector<std::string> &args);
+		
 		// MEMBER FUNCTIONS
 		
 		void loop(); // main loop
 		bool parse(std::string msg, Client *client);
+		void	broadcastMsg(Client &client, Channel *channel, const std::string &msg);
 };
 
 #endif
