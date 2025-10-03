@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/03 18:40:52 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/03 20:14:06 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -330,13 +330,14 @@ void	Server::handlePass(Client &client, const std::vector<std::string> &args)
 }
 bool	Server::isNickTaken(const std::string &nickname) const
 {
-	for(std::map<int, Client>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
+	for(std::map<int, Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		if (it->second.getNick() == nickname)
+		if (it->second->getNick() == nickname)
 			return true;
 	}
 	return false;
 }
+
 void	Server::handleNick(Client &client, const std::vector <std::string> &args)
 {
 	if(args.empty())
@@ -431,7 +432,7 @@ Client*	Server::getUser(const std::string &nick)
 	std::map<int, Client*>::iterator	mit = _clients.begin();
 	for (mit; mit != _clients.end(); mit ++)
 	{
-		if (mit->second->getName() == nick)
+		if (mit->second->getNick() == nick)
 			return mit->second;
 	}
 	return NULL;
@@ -441,7 +442,7 @@ void	Server::broadcastMsg(Client &source, Channel *channel, const std::string &m
 {
 	std::set<Client*>::iterator	sit = channel->getMembers().begin();
 	for (sit; sit != channel->getMembers().end(); sit++)
-		(*sit)->sendMsg(msg); //send msg needs to be adapted to also send prefix
+		(*sit)->sendMsg(source, msg); //send msg needs to be adapted to also send prefix
 }
 
 void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
@@ -510,7 +511,7 @@ void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
 			Client	*target = getUser(*it);
 			if (target == NULL)
 				{} //401 ERR_NOSUCHNICK "<nickname> :No such nick/channel"
-			client.sendMsg(*msg);
+			client.sendMsg(*target, *msg);
 		}
 	}
 }
@@ -542,13 +543,38 @@ void	Server::handleKick(Client &client, const std::vector<std::string> &args)
 		while (i < channels.size())
 			channels[i]->delUser(*(users[j]));
 	}
-		
 }
 
 void	Server::handleInvite(Client &client, const std::vector<std::string> &args)
 {
-	
+	// INVITE <nickname> <channel>
+	if (args.size() != 2)
+		return; //send error msg
+	Client	*user = getUser(args[0]);
+	if (!user)
+		return; // 401 ERR_NOSUCHNICK <nickname> :No such nick
+	Channel *channel = getChannel(args[1]);
+	if (!channel)
+		return; // 403 <channel> :No such channel
+	if (channel->isMember(client))
+		return; // 442 <channel> :You're not on that channel
+	if (channel->isMember(*user))
+		return; // 443 ERR_USERONCHANNEL <nick> <channel> :is already on channel
+	if (channel->isInviteOnly() && !channel->isOperator(client))
+		return; // 482 ERR_CHANOPRIVSNEEDED <channel>
+	channel->addUser(*user);
+	if (channel->isInviteOnly())
+		channel->addInvitedMember(*user);
 }
 
-void	Server::handleTopic(Client &client, const std::vector<std::string> &args);
-void	Server::handleMode(Client &client, const std::vector<std::string> &args);
+void	Server::handleTopic(Client &client, const std::vector<std::string> &args)
+{
+	(void)client;
+	(void)args;
+}
+
+void	Server::handleMode(Client &client, const std::vector<std::string> &args)
+{
+	(void)client;
+	(void)args;
+}

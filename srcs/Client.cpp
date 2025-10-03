@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:57:14 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 15:32:16 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/03 19:36:03 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,4 +147,11 @@ void Client::sendMsg(Client &client, const std::string &msg)
 {
     std::string toSend = msg + "\r\n";
     ::send(client.getFd(), toSend.c_str(), toSend.size(), 0);
+}
+
+const std::string* Client::getMsg(const std::vector<std::string> &args)
+{
+	if (!args.empty() && args.back()[0] == ':')
+		return	&(args.back());
+	return NULL;
 }

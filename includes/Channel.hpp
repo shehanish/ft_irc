@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/03 18:26:51 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/03 20:11:11 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ class	Channel
 		bool		isInvited(Client &client);
 		void		setInviteOnly();
 		void		delInvitation(Client &client);
+		void		addInvitedMember(Client &client);
 		LimitMode	hasLimit();
 		void		setLimit(int &limit);
 		

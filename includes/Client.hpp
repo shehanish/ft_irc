@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/03 18:31:20 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/03 19:36:48 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <set>
 # include <set>
 # include <string>
+# include <vector>
 # include <sys/socket.h>
 # include <sys/socket.h>
 # include <sys/types.h>
@@ -79,7 +80,8 @@ class Client
 	void appendToSendBuffer(const std::string &data);
 	void clearSendBuffer();
 	void sendMsg(Client &client, const std::string &msg);
-
+	const std::string	*getMsg(const std::vector<std::string> &args);
+	
 	// Registration
 	bool isRegistered() const
 	{

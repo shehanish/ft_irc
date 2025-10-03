@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/03 18:46:53 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/03 20:12:54 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,6 +155,12 @@ bool		Channel::isInvited(Client &client)
 void	Channel::delInvitation(Client &client)
 {
 	_invite.clients.erase(&client);
+}
+
+void	Channel::addInvitedMember(Client &client)
+{
+	if (!isInvited(client))
+		_invite.clients.insert(&client);
 }
 
 Channel::LimitMode	Channel::hasLimit()
