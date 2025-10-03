@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 19:22:37 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/03 13:47:39 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <string>
 # include <sys/socket.h>
 # include <iostream>
+# include <errno.h>
 # include <set>
 # include <vector>
 # include <sys/types.h>
@@ -29,16 +30,16 @@ const int MAX_CHANNELS = 10;
 class Client
 {
 	private:
-		int _fd;
-		std::string _ipAddress;
-		std::string _nick;
-		std::string _username;
-		std::string _realname;
-		std::string _recvBuffer;
-		std::string _sendBuffer;
-		bool        _isAuthenticated;
-		bool        _isRegistered;
-		int _nb_chan;
+		int 				_fd;
+		std::string 		_ipAddress;
+		std::string 		_nick;
+		std::string 		_username;
+		std::string 		_realname;
+		std::string 		_recvBuffer; // input from recv
+		std::string 		_sendBuffer; // output that needs to go to send
+		bool        		_isAuthenticated;
+		bool        		_isRegistered;
+		int 				_nb_chan;
 		std::set<Channel *> _channels;
 
 	public:
@@ -71,15 +72,17 @@ class Client
 		void setIsAuthenticated(bool value);
 		const std::string	*getMsg(const std::vector<std::string> &args);
 
-
 		// Channel management
 		void addUserChannel(Channel *channel);
 		void delUserChannel(Channel *channel);
 		void addChannel(); // Increment _nb_chan
 
 		// Message handling
-		void appendToSendBuffer(const std::string& data);
-		void clearSendBuffer();
+		std::vector<std::string> receiveData(const char *data, size_t len);
+		bool flush();
+		// void appendToSendBuffer(const std::string& data);
+		// void clearSendBuffer();
+		void queueMsg(const std::string &msg); 
 		void sendMsg(Client &client, const std::string &msg);
 
 		//Registration

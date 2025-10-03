@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 19:30:54 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/03 14:05:42 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ extern volatile sig_atomic_t signalreceived;
 
 Server::Server()
 {
-	serverInit();
+	// serverInit();
 }
 
 Server::Server(char *port, const std::string& password) : _port(port), _password(password), _adlen(sizeof(_specs))
@@ -87,6 +87,35 @@ int Server::getServerfd() const
 std::map<int, Client*>	& Server::getClients()
 {
 	return (_clients);
+}
+
+Channel*	Server::getChannel(const std::string &channel)
+{
+	std::map<std::string, Channel*>::iterator	mit = _channels.find(channel);
+		if (mit != _channels.end())
+			return mit->second;
+	return NULL;
+}
+
+Channel*	Server::createChannel(const std::string &channel, Client &creator)
+{
+	if (getChannel(channel) != NULL)
+		return getChannel(channel);
+		
+	Channel	*newChannel = new Channel(channel, &creator);
+	_channels[channel] = newChannel;
+	return newChannel;
+}
+
+Client*	Server::getUser(const std::string &nick)
+{
+	std::map<int, Client*>::iterator	mit = _clients.begin();
+	for (; mit != _clients.end(); mit ++)
+	{
+		if (mit->second->getNick() == nick)
+			return mit->second;
+	}
+	return NULL;
 }
 
 // MEMBER FUNCTIONS
@@ -157,8 +186,7 @@ bool Server::parse(std::string msg, Client *client)
 
 	size_t pos = 0;
 	
-    // trim /r/n
-	size_t end = msg.find_last_not_of("\r\n");
+	size_t end = msg.find_last_not_of("\r\n"); // trim /r/n
 	if (end == std::string::npos)
     	return true; // String was only \r\n characters
 	msg = msg.substr(0, end + 1);
@@ -279,7 +307,7 @@ void Server::loop()
 			continue;
 		}
 		
-		for(size_t i = 0; i < poll_fds.size(); i++) // use iterator instead?
+		for(size_t i = 0; i < poll_fds.size(); i++)
 		{
 			if (poll_fds[i].revents & POLLIN) // new client connection
 			{
@@ -293,8 +321,8 @@ void Server::loop()
 					}
 					std::cout << "New connection accepted!" << std::endl;
 
-					std::string welcome = "Welcome to our IRC server 🌎!\r\n";
-					send(client_fd, welcome.c_str(), welcome.length(), 0);
+					// std::string welcome = "Welcome to our IRC server 🌎!\r\n";
+					// send(client_fd, welcome.c_str(), welcome.length(), 0);
 					pollfd newclient_pollfd = {client_fd, POLLIN | POLLOUT, 0};
 					poll_fds.push_back(newclient_pollfd);
 					// Cast to sockaddr_in to access sin_addr (choosing IPv4 here!)
@@ -304,21 +332,24 @@ void Server::loop()
 				}
 				else // existing client sends message
 				{
-					char message[4096]; // check irc documentation
-					memset(message, 0, sizeof(message));
+					char data[512]; // check irc documentation and double check recv
+					memset(data, 0, sizeof(data));
 
-					int bytesnum = recv(poll_fds[i].fd, message, 4096, 0);
+					int bytesnum = recv(poll_fds[i].fd, data, 512, 0);
 					if (bytesnum > 0)
 					{
-						std::string msg(message, bytesnum);
-						std::cout << "Received from client: " << msg;
-						std::map<int, Client*>::iterator it = _clients.find(poll_fds[i].fd);
-						parse(msg, it->second);
+						// std::string msg(message, bytesnum);
+						// std::cout << "Received from client: " << msg;
+						std::map<int, Client*>::iterator it_client = _clients.find(poll_fds[i].fd);
+						std::vector<std::string> msgs = it_client->second->receiveData(data, bytesnum);
+						for (size_t i = 0; i < msgs.size(); i++)
+							parse(msgs[i], it_client->second);
 					}
 					else if (bytesnum == 0)
 					{
 						std::cout << "Client " << poll_fds[i].fd << " hung up" << std::endl;
 						close(poll_fds[i].fd);
+						_clients.erase(poll_fds[i].fd);
 						poll_fds.erase(poll_fds.begin() + i);
 						i--;
 					}
@@ -326,42 +357,22 @@ void Server::loop()
 					{
 						std::cerr << "Error: " << std::strerror(errno) << std::endl;
 						close(poll_fds[i].fd);
+						_clients.erase(poll_fds[i].fd);
 						poll_fds.erase(poll_fds.begin() + i);
 						i--;
 					}
 				}
 			}
+			if (poll_fds[i].revents & POLLOUT)
+			{
+				std::map<int, Client*>::iterator it_client = _clients.find(poll_fds[i].fd);
+				if (it_client->second->flush())
+				{
+					poll_fds[i].events &= ~POLLOUT;
+				}
+			}
 		}
 	}
-}
-
-Channel*	Server::getChannel(const std::string &channel)
-{
-	std::map<std::string, Channel*>::iterator	mit = _channels.find(channel);
-		if (mit != _channels.end())
-			return mit->second;
-	return NULL;
-}
-
-Channel*	Server::createChannel(const std::string &channel, Client &creator)
-{
-	if (getChannel(channel) != NULL)
-		return getChannel(channel);
-		
-	Channel	*newChannel = new Channel(channel, &creator);
-	_channels[channel] = newChannel;
-	return newChannel;
-}
-
-Client*	Server::getUser(const std::string &nick)
-{
-	std::map<int, Client*>::iterator	mit = _clients.begin();
-	for (; mit != _clients.end(); mit ++)
-	{
-		if (mit->second->getNick() == nick)
-			return mit->second;
-	}
-	return NULL;
 }
 
 void	Server::broadcastMsg(Client &source, Channel *channel, const std::string &msg)

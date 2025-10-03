@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:57:14 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 19:13:04 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/03 13:56:06 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ Client::Client(int fd, const std::string& ip)
 // 	return *this;
 // }
 
-//Getters 
+// Getters 
 
 int		Client::getFd() const
 {
@@ -103,7 +103,8 @@ bool	Client::isAuthenticated() const
 	return _isAuthenticated;
 }
 
-//Setters
+// Setters
+
 void	Client::setFd(int fd)
 {
 	_fd = fd;
@@ -140,21 +141,61 @@ void Client::setIsAuthenticated(bool value)
 }
 
  // Message handling
- 
-void Client::appendToSendBuffer(const std::string& data) 
+
+std::vector<std::string> Client::receiveData(const char *data, size_t len)
 {
-    _sendBuffer += data;
+	_recvBuffer.append(data, len);
+	std::vector<std::string> messages;
+	
+	size_t pos = _recvBuffer.find("\r\n");
+	while (pos != std::string::npos)
+	{
+		std::string msg = _recvBuffer.substr(0, pos);
+		messages.push_back(msg);
+		_recvBuffer.erase(0, pos + 2);
+		pos = _recvBuffer.find("\r\n");
+	}
+	return (messages);
 }
 
-void Client::clearSendBuffer() 
+bool Client::flush()
 {
-    _sendBuffer.clear();
+	if (_sendBuffer.empty())
+		return true;
+	
+	size_t sent = send(_fd, _sendBuffer.c_str(), _sendBuffer.size(), 0);
+	if (sent < 0)
+	{
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
+			return false; // try again later
+		return false; // actual problem
+	}
+	_sendBuffer.erase(0, sent);
+	return _sendBuffer.empty();
 }
 
-void Client::sendMsg(Client &client, const std::string &msg) 
+// replaced with receiveData() function
+// void Client::appendToSendBuffer(const std::string& data) 
+// {
+//     _sendBuffer += data;
+// }
+
+// with implemented buffer it would be a bad idea to clear out everything
+// void Client::clearSendBuffer() 
+// {
+//     _sendBuffer.clear();
+// }
+
+void Client::queueMsg(const std::string &msg) 
 {
-    std::string toSend = msg + "\r\n";
-    ::send(client.getFd(), toSend.c_str(), toSend.size(), 0);
+    _sendBuffer += msg + "\r\n";
+}
+
+void Client::sendMsg(Client &client, const std::string &msg)
+{
+	queueMsg(msg); // server manages the messages completely with flush
+	(void)client;
+    // ::send(client.getFd(), _sendBuffer.c_str(), _sendBuffer.size(), 0);
 }
 
 void Client::addUserChannel(Channel* channel) {

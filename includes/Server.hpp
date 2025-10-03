@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/02 19:34:21 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/03 12:02:45 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,36 +36,41 @@ class Channel;
 class Server
 {
 	private:
-		char*					_port;
-		std::string				_password;
-		int						_serverfd;
-		struct addrinfo			_specs;
-		struct addrinfo			*_servinfo;
-		socklen_t				_adlen;
-		std::map<int, Client*>	_clients;
+		char*							_port;
+		std::string						_password;
+		int								_serverfd;
+		struct addrinfo					_specs;
+		struct addrinfo					*_servinfo;
+		socklen_t						_adlen;
+		std::map<int, Client*>			_clients;
 		std::map<std::string, Channel*>	_channels;
 		std::map<std::string, Command*> _commands;
 
+		// CONSTRUCTORS
+		
 		Server(); // private because no server should be constructed without port or password
 		Server(const Server& other); // private because copying should not be possible (still OCF)
 		Server& operator=(const Server& other); // same ^
+		
 		int setUpSocket(); // private because of encapsulation
 	
 	public:
 		
 		// CONSTRUCTORS AND DESTRUCTOR
+		
 		Server(char *port, const std::string& password);
 		~Server();
 
 		// GETTERS AND SETTERS
 
-		char*					getPort() const;
-		std::string				getPassword() const;
-		int						getServerfd() const;
-		std::map<int, Client*>	&getClients();
-		Channel					*getChannel(const std::string &channel);
-		Channel					*createChannel(const std::string &channel, Client &creator);
-		Client					*getUser(const std::string &nick);
+		char*						getPort() const;
+		std::string					getPassword() const;
+		int							getServerfd() const;
+		std::map<int, Client*>		&getClients();
+		Channel						*getChannel(const std::string &channel);
+		Client						*getUser(const std::string &nick);
+		const std::vector<Client*>	getUserArguments(const std::vector<std::string> &args);
+		const std::vector<Channel*>	getChanArguments(const std::vector<std::string> &args);
 		
 		// COMMANDS HANDLERS
 		
@@ -78,15 +83,12 @@ class Server
 		void	handleTopic(Client &client, const std::vector<std::string> &args);
 		void	handleMode(Client &client, const std::vector<std::string> &args);
 		void	handlePass(Client &client, const std::vector<std::string> &args);
-
-		bool	isNickTaken(const std::string &nickname) const;
-		void	registerClient(Client &client);
 		void 	handleUser(Client &client, const std::vector<std::string> &args);
 		
-		// HELPER FUNCTIONS
+		bool	isNickTaken(const std::string &nickname) const;
+		void	registerClient(Client &client);
+		Channel	*createChannel(const std::string &channel, Client &creator);
 
-		const std::vector<Client*>	getUserArguments(const std::vector<std::string> &args);
-		const std::vector<Channel*>	getChanArguments(const std::vector<std::string> &args);		
 		
 		// MEMBER FUNCTIONS
 		
@@ -94,7 +96,7 @@ class Server
 		void loop(); // main loop
 		bool parse(std::string msg, Client *client);
 		void cleanup();
-		void	broadcastMsg(Client &client, Channel *channel, const std::string &msg);
+		void broadcastMsg(Client &client, Channel *channel, const std::string &msg);
 };
 
 #endif
