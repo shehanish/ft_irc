@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/03 20:11:11 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/04 18:24:35 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,9 @@ class	Channel
 		bool		isMember(Client &user);
 		std::set<Client*>	getMembers();
 		std::string	getTopic();
-		void		setTopic(std::string &newTopic);
+		void		setTopic(const std::string &newTopic);
 		void		restrictTopic();
+		bool		hasRestrictedTopic();
 		void		setKey(std::string	&pw);
 		bool		hasKey();
 		bool		checkKey(const std::string &pw);

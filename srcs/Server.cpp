@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/03 20:14:06 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/04 18:57:31 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -569,8 +569,26 @@ void	Server::handleInvite(Client &client, const std::vector<std::string> &args)
 
 void	Server::handleTopic(Client &client, const std::vector<std::string> &args)
 {
-	(void)client;
-	(void)args;
+	size_t	size = args.size();
+	if (size > 2)
+		return; // err
+	Channel	*channel = getChannel(args[0]); 
+	if (!channel)
+		return; // 403 ERR_NOSUCHCHANNEL <channel> :No such channel
+	if (!channel->isMember(client))
+		return; // 442 ERR_NOTONCHANNEL <channel> :You're not on that channel
+	if (size == 2)
+	{
+		if (channel->hasRestrictedTopic() && !channel->isOperator(client))
+			return; // 482 ERR_CHANOPRIVSNEEDED <channel> :You're not channel operator
+		channel->setTopic(args[1]); 
+	} 
+	else if (size == 1)
+	{
+		if (channel->getTopic().empty())
+			client.sendMsg(client, ":server.name 331 <nick> #channel :No topic is set"); //to do
+	}
+	broadcastMsg(client, channel, ":alice!~alice@host TOPIC #school :Homework due Monday!"); // to do
 }
 
 void	Server::handleMode(Client &client, const std::vector<std::string> &args)

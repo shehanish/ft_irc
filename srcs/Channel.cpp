@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/03 20:12:54 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/04 18:23:44 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ std::string	Channel::getTopic()
 	return _topic;
 }
 
-void		Channel::setTopic(std::string &newTopic)
+void		Channel::setTopic(const std::string &newTopic)
 {
 	_topic = newTopic;
 }
@@ -111,6 +111,11 @@ void		Channel::setTopic(std::string &newTopic)
 void	Channel::restrictTopic()	
 {
 	_topic_restrict = true;
+}
+
+bool	Channel::hasRestrictedTopic()
+{
+	return _topic_restrict;
 }
 
 void	Channel::setKey(std::string	&pw)
