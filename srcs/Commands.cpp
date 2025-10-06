@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Command.cpp                                        :+:      :+:    :+:   */
+/*   Commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 17:28:05 by spitul            #+#    #+#             */
-/*   Updated: 2025/09/20 17:53:48 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/06 16:39:52 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,4 +45,9 @@ void TopicCmd::execute(Server &server, Client &client, const std::vector<std::st
 void ModeCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
 {
 	server.handleMode(client, args);
+}
+
+void PassCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
+{
+	server.handlePass(client, args);
 }

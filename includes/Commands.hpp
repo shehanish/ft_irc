@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/18 07:38:28 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/06 12:32:49 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/06 16:38:43 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,11 @@ class TopicCmd	: public Command
 };
 
 class ModeCmd	: public Command
+{
+	void execute(Server &server, Client &client, const std::vector<std::string> &args);
+};
+
+class PassCmd	: public Command
 {
 	void execute(Server &server, Client &client, const std::vector<std::string> &args);
 };

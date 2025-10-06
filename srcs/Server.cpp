@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/06 12:52:21 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/06 16:41:01 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,14 +182,12 @@ bool Server::parse(std::string msg, Client *client)
 	if (len == 0)
 		return true; // should be "silently ignored"
 	else if (len > 512)
-		return false; // see rules	
+	{
+		std::cerr << "417 ERR_INPUTTOOLONG" << std::endl;
+		return false;
+	}
 
 	size_t pos = 0;
-	
-	size_t end = msg.find_last_not_of("\r\n"); // trim /r/n
-	if (end == std::string::npos)
-    	return true; // String was only \r\n characters
-	msg = msg.substr(0, end + 1);
 	
 	// extract prefix
 	if (msg[0] == ':')
@@ -200,12 +198,15 @@ bool Server::parse(std::string msg, Client *client)
 		std::string prefix = msg.substr(1, space_pos - 1);
 		std::cout << "The prefix is: " << prefix << std::endl;
 		pos = space_pos;
-		// check whether prefix is valid or do whatever is necessary
+		// TODO store prefix in struct and pass it to execute
 	}
 	while (pos < msg.size() && msg[pos] == ' ')
 		pos++;
 	if (pos >= msg.size())
-		return false; // no command found
+	{
+		std::cerr << "No command found" << std::endl; // TODO should be ignored actually 
+		return false;
+	}
 	
 	// extract command
 	size_t cmd_start = pos;
@@ -220,17 +221,19 @@ bool Server::parse(std::string msg, Client *client)
 	}
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper); // convert to capitals
 	std::cout << "The command is: " << cmd << std::endl;
+	if (cmd_end == std::string::npos)
+		pos = msg.size();
+	else
+		pos = cmd_end;
 
 	// look up command
 	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
 	if (it == _commands.end())
 	{
-		std::cout << "Command has not yet been implemented" << std::endl; // TODO remove this and uncomment following line
-		// return (false); // unknown or invalid command
+		std::cerr << "421 ERR_UNKNOWNCOMMAND" << std::endl;
+		return (false); // unknown or invalid command
 	}
-	
 	pos = cmd_end;
-
 	
 	// parse args
 	std::vector<std::string> args;
@@ -264,8 +267,7 @@ bool Server::parse(std::string msg, Client *client)
 	}
 	
 	// pass to execute
-	// it->second->execute(*this, *client, args);
-	(void)*client; // TODO change this and uncomment the above
+	it->second->execute(*this, *client, args);
 	return true;
 }
 
@@ -278,6 +280,7 @@ void Server::serverInit()
 	_commands["INVITE"] = new InviteCmd();
 	_commands["TOPIC"] = new TopicCmd();
 	_commands["MODE"] = new ModeCmd();
+	_commands["PASS"] = new PassCmd();
 }
 
 /**
@@ -338,8 +341,6 @@ void Server::loop()
 					int bytesnum = recv(poll_fds[i].fd, data, 512, 0);
 					if (bytesnum > 0)
 					{
-						// std::string msg(message, bytesnum);
-						// std::cout << "Received from client: " << msg;
 						std::map<int, Client*>::iterator it_client = _clients.find(poll_fds[i].fd);
 						std::vector<std::string> msgs = it_client->second->receiveData(data, bytesnum);
 						for (size_t i = 0; i < msgs.size(); i++)
