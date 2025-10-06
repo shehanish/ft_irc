@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 17:28:05 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/06 16:39:52 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/06 17:16:28 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,4 +50,14 @@ void ModeCmd::execute(Server &server, Client &client, const std::vector<std::str
 void PassCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
 {
 	server.handlePass(client, args);
+}
+
+void NickCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
+{
+	server.handleNick(client, args);
+}
+
+void UserCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
+{
+	server.handleUser(client, args);
 }

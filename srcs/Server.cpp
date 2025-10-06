@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/06 16:41:01 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/06 17:26:06 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,7 +231,7 @@ bool Server::parse(std::string msg, Client *client)
 	if (it == _commands.end())
 	{
 		std::cerr << "421 ERR_UNKNOWNCOMMAND" << std::endl;
-		return (false); // unknown or invalid command
+		return (false);
 	}
 	pos = cmd_end;
 	
@@ -281,6 +281,8 @@ void Server::serverInit()
 	_commands["TOPIC"] = new TopicCmd();
 	_commands["MODE"] = new ModeCmd();
 	_commands["PASS"] = new PassCmd();
+	_commands["NICK"] = new NickCmd();
+	_commands["USER"] = new UserCmd();
 }
 
 /**
@@ -324,8 +326,8 @@ void Server::loop()
 					}
 					std::cout << "New connection accepted!" << std::endl;
 
-					// std::string welcome = "Welcome to our IRC server 🌎!\r\n";
-					// send(client_fd, welcome.c_str(), welcome.length(), 0);
+					std::string welcome = "Welcome to our IRC server 🌎!\r\n";
+					send(client_fd, welcome.c_str(), welcome.length(), 0);
 					pollfd newclient_pollfd = {client_fd, POLLIN | POLLOUT, 0};
 					poll_fds.push_back(newclient_pollfd);
 					// Cast to sockaddr_in to access sin_addr (choosing IPv4 here!)
@@ -335,7 +337,7 @@ void Server::loop()
 				}
 				else // existing client sends message
 				{
-					char data[512]; // check irc documentation and double check recv
+					char data[512]; // TODO check irc documentation and double check recv
 					memset(data, 0, sizeof(data));
 
 					int bytesnum = recv(poll_fds[i].fd, data, 512, 0);
@@ -380,7 +382,7 @@ void	Server::broadcastMsg(Client &source, Channel *channel, const std::string &m
 {
 	std::set<Client*>::iterator	sit = channel->getMembers().begin();
 	for (; sit != channel->getMembers().end(); sit++)
-		(*sit)->sendMsg(source, msg); //send msg needs to be adapted to also send prefix // TODO check i added source here
+		(*sit)->sendMsg(source, msg); // TODO send msg needs to be adapted to also send prefix 
 }
 
 void	Server::handlePass(Client &client, const std::vector<std::string> &args)
