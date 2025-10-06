@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/04 18:23:44 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/06 08:37:25 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,4 +177,9 @@ void	Channel::setLimit(int &newLimit)
 {
 	_limit.active = true;
 	_limit.value = newLimit;	
+}
+
+int	Channel::getLimit()
+{
+	return _limit.value;
 }
