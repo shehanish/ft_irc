@@ -6,32 +6,35 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/03 12:02:45 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/06 12:36:24 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
+# include "Channel.hpp"
+# include "Client.hpp"
+# include "Commands.hpp"
+# include <algorithm>
+# include <errno.h>
 # include <iostream>
-# include <string>
+# include <algorithm>
 # include <map>
 # include <vector>
-# include <algorithm>
-# include <poll.h>
+# include <netdb.h>
 # include <netinet/in.h>
 # include <netdb.h>
 # include <cstring>
 # include <csignal>
 # include <unistd.h>
+# include <poll.h>
+# include <string>
 # include <sys/socket.h>
 # include <sys/types.h>
-# include <errno.h>
-# include "Channel.hpp"
-# include "Client.hpp"
-# include "Commands.hpp"
 
-class Channel;
+
+class	Channel;
 
 class Server
 {
@@ -61,7 +64,7 @@ class Server
 		Server(char *port, const std::string& password);
 		~Server();
 
-		// GETTERS AND SETTERS
+	// GETTERS AND SETTERS
 
 		char*						getPort() const;
 		std::string					getPassword() const;

@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/02 19:29:32 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/06 12:37:22 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,10 @@ void	Channel::delUser(Client &user)
 {
 	_members.erase(&user);
 	user.delUserChannel(this);
+	if (isOperator(user))
+		this->delOperator(user);
+	if (isInviteOnly() && isInvited(user))
+		this->delInvitation(user);
 }
 		
 void	Channel::delOperator(Client &user)
@@ -94,7 +98,7 @@ std::string	Channel::getTopic()
 	return _topic;
 }
 
-void		Channel::setTopic(std::string &newTopic)
+void		Channel::setTopic(const std::string &newTopic)
 {
 	_topic = newTopic;
 }
@@ -102,6 +106,11 @@ void		Channel::setTopic(std::string &newTopic)
 void	Channel::restrictTopic()	
 {
 	_topic_restrict = true;
+}
+
+bool	Channel::hasRestrictedTopic()
+{
+	return _topic_restrict;
 }
 
 void	Channel::setKey(std::string	&pw)
@@ -148,6 +157,12 @@ void	Channel::delInvitation(Client &client)
 	_invite.clients.erase(&client);
 }
 
+void	Channel::addInvitedMember(Client &client)
+{
+	if (!isInvited(client))
+		_invite.clients.insert(&client);
+}
+
 Channel::LimitMode	Channel::hasLimit()
 {
 	return _limit;
@@ -157,4 +172,9 @@ void	Channel::setLimit(int &newLimit)
 {
 	_limit.active = true;
 	_limit.value = newLimit;	
+}
+
+int	Channel::getLimit()
+{
+	return _limit.value;
 }

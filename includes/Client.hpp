@@ -6,15 +6,17 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/03 13:47:39 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/06 12:38:23 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
-#define CLIENT_HPP
+# define CLIENT_HPP
 
 # include <set>
 # include <string>
+# include <vector>
+# include <sys/socket.h>
 # include <sys/socket.h>
 # include <iostream>
 # include <errno.h>
@@ -25,7 +27,7 @@
 
 class Channel; // Forward declaration
 
-const int MAX_CHANNELS = 10;
+const int	MAX_CHANNELS = 10;
 
 class Client
 {

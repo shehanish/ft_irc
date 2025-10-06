@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/02 19:25:46 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/06 12:29:36 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,11 @@ class	Channel
 		void		delOperator(Client &user);
 		bool		isOperator(Client &user);
 		bool		isMember(Client &user);
+		std::set<Client*>	getMembers();
 		std::string	getTopic();
-		void		setTopic(std::string &newTopic);
+		void		setTopic(const std::string &newTopic);
 		void		restrictTopic();
+		bool		hasRestrictedTopic();
 		void		setKey(std::string	&pw);
 		bool		hasKey();
 		bool		checkKey(const std::string &pw);
@@ -57,12 +59,10 @@ class	Channel
 		bool		isInvited(Client &client);
 		void		setInviteOnly();
 		void		delInvitation(Client &client);
+		void		addInvitedMember(Client &client);
 		LimitMode	hasLimit();
 		void		setLimit(int &limit);
-
-		const std::set<Client*>& getMembers() const {
-        return _members;
-    }
+		int			getLimit();
 		
 	private:
 	
