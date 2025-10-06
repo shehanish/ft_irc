@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/06 12:29:36 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/06 12:48:20 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ class	Channel
 		void		delOperator(Client &user);
 		bool		isOperator(Client &user);
 		bool		isMember(Client &user);
-		std::set<Client*>	getMembers();
+		std::set<Client*>	&getMembers();
 		std::string	getTopic();
 		void		setTopic(const std::string &newTopic);
 		void		restrictTopic();

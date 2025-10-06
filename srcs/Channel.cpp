@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/06 12:37:22 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/06 12:49:50 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,11 @@ bool		Channel::isMember(Client &user)
 	if (_members.find(&user) != _members.end())
 		return true;
 	return false;
+}
+
+std::set<Client*>& Channel::getMembers() 
+{ 
+	return _members; 
 }
 
 std::string	Channel::getTopic()

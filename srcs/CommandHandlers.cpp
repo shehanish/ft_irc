@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandlers.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 08:39:57 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/06 08:50:21 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/06 12:45:35 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
 			return;
 		if (!channel->isInvited(client))
 			return;
-		if (channel->hasLimit().active && channel->getMembers().size() >= channel->getLimit())
+		if (channel->hasLimit().active && channel->getMembers().size() >= static_cast<size_t>(channel->getLimit()))
+		;
 			return; // ERR_CHANNELISFULL (471) 
 		channel->addUser(client);
 		client.addChannel();
@@ -45,7 +46,7 @@ void	Server::handlePart(Client &client, const std::vector<std::string> &args)
 		return;
 	Channel	*channel;
 	std::vector<std::string>::const_iterator	it = args.begin();
-	for (it; it != args.end(); it ++)
+	for (; it != args.end(); it ++)
 	{
 		channel = getChannel(*it);
 		if (!channel->isMember(client))
@@ -93,10 +94,11 @@ void	Server::handleKick(Client &client, const std::vector<std::string> &args)
 	std::vector<Client*>	users = getUserArguments(args);
 	std::vector<Channel*>	channels = getChanArguments(args);
 	
-	const std::string *msg = client.getMsg(args);
+	// const std::string *msg = 
+	client.getMsg(args);
 	
-	int	i = 0;
-	int	j = 0;
+	size_t	i = 0;
+	size_t	j = 0;
 	while (i < channels.size() && j < users.size())
 	{
 		channels[i++]->delUser(*(users[j++]));
@@ -163,6 +165,7 @@ void	Server::handleTopic(Client &client, const std::vector<std::string> &args)
 void	Server::handleMode(Client &client, const std::vector<std::string> &args)
 {
 	Channel *channel = getChannel(args[0]);
+	(void)client;
 	if (!channel)
 		return; // no such channel
 }
