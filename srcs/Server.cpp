@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/06 17:26:06 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/06 18:17:42 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,7 @@ extern volatile sig_atomic_t signalreceived;
 
 // CONSTRUCTORS
 
-Server::Server()
-{
-	// serverInit();
-}
+Server::Server() {}
 
 Server::Server(char *port, const std::string& password) : _port(port), _password(password), _adlen(sizeof(_specs))
 {
@@ -63,8 +60,17 @@ Server::~Server()
     _commands.clear();
 	for (std::map<int, Client*>::iterator cit = _clients.begin(); 
          cit != _clients.end(); ++cit)
-        delete cit->second;
+	{
+        int fd = cit->first;
+		close(fd);
+		delete cit->second;
+	}
 	_clients.clear();
+	if (_serverfd != -1)
+	{
+		close(_serverfd);
+		_serverfd = -1;
+	}
 }
 
 // GETTERS AND SETTERS
@@ -140,9 +146,12 @@ int Server::setUpSocket()
 	_specs.ai_flags = AI_PASSIVE; // fill in my IP for me
 	_adlen = sizeof(_specs);
 
-	if (getaddrinfo(NULL, _port, &_specs, &_servinfo) != 0)
+	int status = getaddrinfo(NULL, _port, &_specs, &_servinfo);
+	if (status != 0)
+	{
+		std::cerr << "getaddrinfo error: " << gai_strerror(status) << std::endl;
 		throw std::runtime_error("Error: filling serverinfo struct with address infomation failed");
-
+	}
 	_serverfd = socket(_servinfo->ai_family, _servinfo->ai_socktype, _servinfo->ai_protocol); 
 	if(_serverfd < 0)
 		throw std::runtime_error("Error: Could not create socket");
@@ -164,6 +173,7 @@ int Server::setUpSocket()
 }
 
 // use nc for testing
+// example: echo -e "PASS mysecret\r\nNICK anna\r\nUSER anna 0 * :Anna Example\r\n" | nc localhost 6667
 
 /**
  * @brief Parses the extracted message into the components <prefix>, <command> and list of parameters (<params>)..
@@ -337,7 +347,7 @@ void Server::loop()
 				}
 				else // existing client sends message
 				{
-					char data[512]; // TODO check irc documentation and double check recv
+					char data[512];
 					memset(data, 0, sizeof(data));
 
 					int bytesnum = recv(poll_fds[i].fd, data, 512, 0);
@@ -348,7 +358,7 @@ void Server::loop()
 						for (size_t i = 0; i < msgs.size(); i++)
 							parse(msgs[i], it_client->second);
 					}
-					else if (bytesnum == 0)
+					else if (bytesnum == 0) // handles Ctrl-D signal
 					{
 						std::cout << "Client " << poll_fds[i].fd << " hung up" << std::endl;
 						close(poll_fds[i].fd);
