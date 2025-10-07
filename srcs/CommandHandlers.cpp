@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 08:39:57 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/06 08:50:21 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/07 06:37:21 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
 {
+	if (args.empty())
+		return; // :server 461 <nick> JOIN :Not enough parameters
 	Channel	*channel;
 	
 	if (args.empty())
@@ -62,8 +64,8 @@ void	Server::handlePart(Client &client, const std::vector<std::string> &args)
 
 void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
 {
-	//if (!args.empty())
-	
+	if (!args.empty())
+		return; // :server 461 <nick> PRIVMSG :Not enough parameters
 	const std::string	*msg = client.getMsg(args);
 	std::vector<std::string>::const_iterator	it = args.begin();
 	while (it != args.end())
@@ -160,9 +162,30 @@ void	Server::handleTopic(Client &client, const std::vector<std::string> &args)
 	broadcastMsg(client, channel, ":alice!~alice@host TOPIC #school :Homework due Monday!"); // to do
 }
 
+static std::vector<std::string>	getModeParams(const std::vector<std::string> &args)
+{
+	std::vector<std::string>	params;
+	for (int i = 1; i < args.size(); i++)
+	{
+		if (args[i][0] != '+' && args[i][0] != '-')
+			params.push_back(args[i]);
+	}
+	return params;
+}
+
 void	Server::handleMode(Client &client, const std::vector<std::string> &args)
 {
+	bool	adding = false;
+	
 	Channel *channel = getChannel(args[0]);
 	if (!channel)
 		return; // no such channel
+	if (!channel->isOperator(client))
+		return; // 482 ERR_CHANOPRIVSNEEDED
+	std::vector<std::string>	params = getModeParams(args);
+	for (int i = 1; i < args.size(); i++)
+	{
+		char	c = 
+	}
+	
 }

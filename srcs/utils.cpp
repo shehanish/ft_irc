@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/29 18:02:35 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/03 19:51:59 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/07 06:19:27 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ const std::vector<Client*>	Server::getUserArguments(const std::vector<std::strin
 			Client *new_user = getUser(args[i]);
 			if (new_user != NULL)
 				users.push_back(new_user);
-			
+			else
+				; // prob error msg?
 		}
 	}
 	return users;
