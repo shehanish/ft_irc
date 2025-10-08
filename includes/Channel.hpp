@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/06 08:35:59 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/08 08:09:53 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,14 +48,16 @@ class	Channel
 		std::set<Client*>	getMembers();
 		std::string	getTopic();
 		void		setTopic(const std::string &newTopic);
-		void		restrictTopic();
+		void		restrictTopic(bool restrict);
+		//void		unrestrictTopic();
 		bool		hasRestrictedTopic();
-		void		setKey(std::string	&pw);
+		void		setKey(const std::string	&pw);
 		bool		hasKey();
 		bool		checkKey(const std::string &pw);
 		bool		isInviteOnly();
 		bool		isInvited(Client &client);
-		void		setInviteOnly();
+		void		setInviteOnly(bool enableInvite);
+		//void		unsetInviteOnly();
 		void		delInvitation(Client &client);
 		void		addInvitedMember(Client &client);
 		LimitMode	hasLimit();

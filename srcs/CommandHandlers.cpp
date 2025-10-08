@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 08:39:57 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/07 06:37:21 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/08 08:12:17 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,9 +183,55 @@ void	Server::handleMode(Client &client, const std::vector<std::string> &args)
 	if (!channel->isOperator(client))
 		return; // 482 ERR_CHANOPRIVSNEEDED
 	std::vector<std::string>	params = getModeParams(args);
+	int	indexParams = 0;
 	for (int i = 1; i < args.size(); i++)
 	{
-		char	c = 
+		std::string::const_iterator	it = args[i].begin();
+		for (it; it != args[i].end(); it ++)
+		{
+			char	c = *it;
+			if (c == '+')
+			{
+				adding = true;
+				continue;
+			}
+			if (c == '-')
+			{
+				adding = false;
+				continue;
+			}
+			switch(c) //itkol
+			{
+				case 'i':
+					channel->setInviteOnly(adding);
+					break;
+				case 't':
+					channel->restrictTopic(adding);
+					break;
+				case 'k':
+					if (adding)
+					{
+						if (indexParams < params.size() && !params[indexParams].empty())
+							channel->setKey(params[indexParams++]);
+						else
+							return; // 461 ERR_NEEDMOREPARAMS ERR_INVALIDMODEPARAM (696) 
+					}
+					else
+					{
+						if (indexParams < params.size())
+						{
+							if (channel->checkKey(params[indexParams]))
+							{
+								channel->setKey("");
+								indexParams++;
+							}
+							else
+								return; // ERR_INVALIDKEY (525)
+						}
+					}
+			}
+		}
+		
 	}
 	
 }
