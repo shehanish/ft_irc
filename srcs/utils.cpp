@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/29 18:02:35 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/06 12:41:31 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/08 17:11:50 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ const std::vector<Client*>	Server::getUserArguments(const std::vector<std::strin
 			Client *new_user = getUser(args[i]);
 			if (new_user != NULL)
 				users.push_back(new_user);
-			
+			else
+				; // prob error msg?
 		}
 	}
 	return users;

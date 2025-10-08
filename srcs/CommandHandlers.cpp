@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandlers.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 08:39:57 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/06 12:45:35 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/08 17:09:35 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
 {
+	if (args.empty())
+		return; // :server 461 <nick> JOIN :Not enough parameters
 	Channel	*channel;
 	
 	if (args.empty())
@@ -63,8 +65,8 @@ void	Server::handlePart(Client &client, const std::vector<std::string> &args)
 
 void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
 {
-	//if (!args.empty())
-	
+	if (!args.empty())
+		return; // :server 461 <nick> PRIVMSG :Not enough parameters
 	const std::string	*msg = client.getMsg(args);
 	std::vector<std::string>::const_iterator	it = args.begin();
 	while (it != args.end())
@@ -162,10 +164,77 @@ void	Server::handleTopic(Client &client, const std::vector<std::string> &args)
 	broadcastMsg(client, channel, ":alice!~alice@host TOPIC #school :Homework due Monday!"); // to do
 }
 
+static std::vector<std::string>	getModeParams(const std::vector<std::string> &args)
+{
+	std::vector<std::string>	params;
+	for (int i = 1; i < args.size(); i++)
+	{
+		if (args[i][0] != '+' && args[i][0] != '-')
+			params.push_back(args[i]);
+	}
+	return params;
+}
+
 void	Server::handleMode(Client &client, const std::vector<std::string> &args)
 {
+	bool	adding = false;
+	
 	Channel *channel = getChannel(args[0]);
 	(void)client;
 	if (!channel)
 		return; // no such channel
+	if (!channel->isOperator(client))
+		return; // 482 ERR_CHANOPRIVSNEEDED
+	std::vector<std::string>	params = getModeParams(args);
+	int	indexParams = 0;
+	for (int i = 1; i < args.size(); i++)
+	{
+		std::string::const_iterator	it = args[i].begin();
+		for (it; it != args[i].end(); it ++)
+		{
+			char	c = *it;
+			if (c == '+')
+			{
+				adding = true;
+				continue;
+			}
+			if (c == '-')
+			{
+				adding = false;
+				continue;
+			}
+			switch(c) //itkol
+			{
+				case 'i':
+					channel->setInviteOnly(adding);
+					break;
+				case 't':
+					channel->restrictTopic(adding);
+					break;
+				case 'k':
+					if (adding)
+					{
+						if (indexParams < params.size() && !params[indexParams].empty())
+							channel->setKey(params[indexParams++]);
+						else
+							return; // 461 ERR_NEEDMOREPARAMS ERR_INVALIDMODEPARAM (696) 
+					}
+					else
+					{
+						if (indexParams < params.size())
+						{
+							if (channel->checkKey(params[indexParams]))
+							{
+								channel->setKey("");
+								indexParams++;
+							}
+							else
+								return; // ERR_INVALIDKEY (525)
+						}
+					}
+			}
+		}
+		
+	}
+	
 }
