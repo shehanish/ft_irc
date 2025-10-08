@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 08:39:57 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/08 17:18:55 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/08 18:18:08 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,16 +212,16 @@ void	Server::handleMode(Client &client, const std::vector<std::string> &args)
 					channel->restrictTopic(adding);
 					break;
 				case 'k':
-					if (adding)
+					if (indexParams < params.size())
 					{
-						if (indexParams < params.size() && !params[indexParams].empty())
-							channel->setKey(params[indexParams++]);
+						if (adding)
+						{	
+							if (!params[indexParams].empty())
+								channel->setKey(params[indexParams++]);
+							else
+								return; // 461 ERR_NEEDMOREPARAMS ERR_INVALIDMODEPARAM (696) 
+						}
 						else
-							return; // 461 ERR_NEEDMOREPARAMS ERR_INVALIDMODEPARAM (696) 
-					}
-					else
-					{
-						if (indexParams < params.size())
 						{
 							if (channel->checkKey(params[indexParams]))
 							{
@@ -232,9 +232,24 @@ void	Server::handleMode(Client &client, const std::vector<std::string> &args)
 								return; // ERR_INVALIDKEY (525)
 						}
 					}
+					break;
+				case 'o':
+					Client	*user = NULL;
+					if (indexParams < params.size())
+						user = getUser(params[indexParams]);
+					else
+						return; // not on channel
+					if (channel->isMember(*user))
+					{
+						if (adding)
+							channel->addOperator(client);
+						else
+							channel->delInvitation(client);
+					}
+					break;
+				case 'l':
+					
 			}
 		}
-		
 	}
-	
 }

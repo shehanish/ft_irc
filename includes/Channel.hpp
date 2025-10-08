@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/08 17:06:44 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/08 17:45:14 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #define CHANNEL_HPP
 
 # include <set>
-# include "Client.hpp"
+# include "../includes/Client.hpp"
 # include <string>
 # include <sys/socket.h>
 

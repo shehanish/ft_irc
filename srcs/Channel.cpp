@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/08 17:08:47 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/08 17:49:01 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ Channel::Channel(const std::string &name, Client *creator)
 		_members.insert(creator);
 		_operators.insert(creator);
 	}
+	std::string str = name + " channel constructed";
+	creator->queueMsg(str);
 }
 
 Channel::Channel(const Channel &src)
