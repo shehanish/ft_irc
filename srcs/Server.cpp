@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/06 18:17:42 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/08 17:12:28 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,6 +188,8 @@ int Server::setUpSocket()
  */
 bool Server::parse(std::string msg, Client *client)
 {
+	s_data data;
+	
 	int len = msg.size();
 	if (len == 0)
 		return true; // should be "silently ignored"
@@ -205,10 +207,9 @@ bool Server::parse(std::string msg, Client *client)
 		size_t space_pos = msg.find(' ');
 		if (space_pos == std::string::npos)
 			return false; // : without prefix
-		std::string prefix = msg.substr(1, space_pos - 1);
-		std::cout << "The prefix is: " << prefix << std::endl;
+		data.prefix = msg.substr(1, space_pos - 1);
+		std::cout << "The prefix is: " << data.prefix << std::endl;
 		pos = space_pos;
-		// TODO store prefix in struct and pass it to execute
 	}
 	while (pos < msg.size() && msg[pos] == ' ')
 		pos++;
@@ -246,7 +247,6 @@ bool Server::parse(std::string msg, Client *client)
 	pos = cmd_end;
 	
 	// parse args
-	std::vector<std::string> args;
     while (pos < msg.size())	
 	{
 		while (pos < msg.size() && msg[pos] == ' ')
@@ -254,7 +254,7 @@ bool Server::parse(std::string msg, Client *client)
 		if (msg[pos] == ':')
 		{
 			std::string newarg = msg.substr(pos); // include the ':'
-			args.push_back(newarg);
+			data.args.push_back(newarg);
 			break;
 		}
 		else
@@ -262,22 +262,22 @@ bool Server::parse(std::string msg, Client *client)
 			size_t next_space = msg.find(' ', pos);
 			if (next_space == std::string::npos)
             {
-                args.push_back(msg.substr(pos));
+                data.args.push_back(msg.substr(pos));
                 break;
             }
 			std::string nextarg = msg.substr(pos, next_space - pos);
-			args.push_back(nextarg);
+			data.args.push_back(nextarg);
 			pos = next_space;
 		}
 	}
 	// print args
-	for (size_t i = 0; i < args.size(); i++)
+	for (size_t i = 0; i < data.args.size(); i++)
 	{
-		std::cout << "Arg " << i + 1 << ": " << args[i] << std::endl;
+		std::cout << "Arg " << i + 1 << ": " << data.args[i] << std::endl;
 	}
 	
 	// pass to execute
-	it->second->execute(*this, *client, args);
+	it->second->execute(*this, *client, data);
 	return true;
 }
 

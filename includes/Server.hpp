@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/06 12:36:24 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/08 17:09:24 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,13 @@
 # include <sys/socket.h>
 # include <sys/types.h>
 
-
 class	Channel;
+
+struct s_data 
+{
+	std::string					prefix;
+	std::vector<std::string>	args;
+};
 
 class Server
 {

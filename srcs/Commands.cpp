@@ -6,58 +6,58 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 17:28:05 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/06 17:16:28 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/08 17:08:56 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Server.hpp"
 
-void JoinCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
+void JoinCmd::execute(Server &server, Client &client, s_data &data)
 {
-	server.handleJoin(client, args);
+	server.handleJoin(client, data.args);
 }
 
-void PartCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
+void PartCmd::execute(Server &server, Client &client, s_data &data)
 {
-	server.handlePart(client, args);
+	server.handlePart(client, data.args);
 }
 
-void PrivMsgCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
+void PrivMsgCmd::execute(Server &server, Client &client, s_data &data)
 {
-	server.handlePrivMsg(client, args);
+	server.handlePrivMsg(client, data.args);
 }
 
-void KickCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
+void KickCmd::execute(Server &server, Client &client, s_data &data)
 {
-	server.handleKick(client, args);
+	server.handleKick(client, data.args);
 }
 
-void InviteCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
+void InviteCmd::execute(Server &server, Client &client, s_data &data)
 {
-	server.handleInvite(client, args);
+	server.handleInvite(client, data.args);
 }
 
-void TopicCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
+void TopicCmd::execute(Server &server, Client &client, s_data &data)
 {
-	server.handleTopic(client, args);
+	server.handleTopic(client, data.args);
 }
 
-void ModeCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
+void ModeCmd::execute(Server &server, Client &client, s_data &data)
 {
-	server.handleMode(client, args);
+	server.handleMode(client, data.args);
 }
 
-void PassCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
+void PassCmd::execute(Server &server, Client &client, s_data &data)
 {
-	server.handlePass(client, args);
+	server.handlePass(client, data.args);
 }
 
-void NickCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
+void NickCmd::execute(Server &server, Client &client, s_data &data)
 {
-	server.handleNick(client, args);
+	server.handleNick(client, data.args);
 }
 
-void UserCmd::execute(Server &server, Client &client, const std::vector<std::string> &args)
+void UserCmd::execute(Server &server, Client &client, s_data &data)
 {
-	server.handleUser(client, args);
+	server.handleUser(client, data.args);
 }
