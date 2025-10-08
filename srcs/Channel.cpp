@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/06 18:08:17 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/08 17:31:49 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,17 +108,25 @@ void		Channel::setTopic(const std::string &newTopic)
 	_topic = newTopic;
 }
 
-void	Channel::restrictTopic()	
+void	Channel::restrictTopic(bool restrict)	
 {
-	_topic_restrict = true;
+	if (restrict)
+		_topic_restrict = true;
+	else
+		_topic_restrict = false;
 }
+
+// void	Channel::unrestrictTopic()
+// {
+// 	_topic_restrict = false;
+// }
 
 bool	Channel::hasRestrictedTopic()
 {
 	return _topic_restrict;
 }
 
-void	Channel::setKey(std::string	&pw)
+void	Channel::setKey(const std::string	&pw)
 {
 	_key = pw;
 }
@@ -141,10 +149,18 @@ bool	Channel::isInviteOnly()
 	return _invite.active;
 }
 
-void	Channel::setInviteOnly()
+void	Channel::setInviteOnly(bool enableInvite)
 {
-	_invite.active = true;
+	if (enableInvite)
+		_invite.active = true;
+	else
+		_invite.active = false;
 }
+
+// void	Channel::unsetInviteOnly()
+// {
+// 	_invite.active = false;
+// }
 
 bool		Channel::isInvited(Client &client)
 {
