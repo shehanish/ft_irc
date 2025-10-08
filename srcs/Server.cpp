@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/08 17:25:58 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/08 18:45:59 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,7 +186,7 @@ int Server::setUpSocket()
  *
  * @note More detailed error handling still needs to be implemented
  */
-bool Server::parse(std::string msg, Client *client)
+bool Server::parse(std::string &msg, Client *client)
 {
 	s_data data;
 	
@@ -195,7 +195,7 @@ bool Server::parse(std::string msg, Client *client)
 		return true; // should be "silently ignored"
 	else if (len > 512)
 	{
-		std::cerr << "417 ERR_INPUTTOOLONG" << std::endl;
+		client->queueMsg(":localhost 417 " + client->getNick() + " :Input too long\r\n");
 		return false;
 	}
 
@@ -208,7 +208,7 @@ bool Server::parse(std::string msg, Client *client)
 		if (space_pos == std::string::npos)
 			return false; // : without prefix
 		data.prefix = msg.substr(1, space_pos - 1);
-		std::cout << "The prefix is: " << data.prefix << std::endl;
+		std::cout << "The prefix is: " << data.prefix << std::endl; // TODO remove this
 		pos = space_pos;
 	}
 	while (pos < msg.size() && msg[pos] == ' ')
@@ -242,11 +242,13 @@ bool Server::parse(std::string msg, Client *client)
 	if (it == _commands.end())
 	{
 		std::cerr << "421 ERR_UNKNOWNCOMMAND" << std::endl;
+		client->queueMsg(":localhost 421 " + client->getNick() + cmd + " :Unknown command"); // TODO make this work
 		return (false);
 	}
 	pos = cmd_end;
 	
 	// parse args
+	data.args.reserve(10); 
     while (pos < msg.size())	
 	{
 		while (pos < msg.size() && msg[pos] == ' ')
@@ -254,6 +256,7 @@ bool Server::parse(std::string msg, Client *client)
 		if (msg[pos] == ':')
 		{
 			std::string newarg = msg.substr(pos); // include the ':'
+			// problem: According to RFC 2812, the trailing parameter should not include the : itself in the stored argument.
 			data.args.push_back(newarg);
 			break;
 		}
@@ -270,7 +273,7 @@ bool Server::parse(std::string msg, Client *client)
 			pos = next_space;
 		}
 	}
-	// print args
+	// TODO remove this (prints args)
 	for (size_t i = 0; i < data.args.size(); i++)
 	{
 		std::cout << "Arg " << i + 1 << ": " << data.args[i] << std::endl;
@@ -318,6 +321,8 @@ void Server::loop()
 	{
 		if (poll(poll_fds.data(), poll_fds.size(), -1) < 0)
 		{
+			if (errno == EINTR)
+				continue; // interrupted by signal: just retry
 			std::cerr << "Poll error: " << std::strerror(errno) << std::endl;
 			continue;
 		}
@@ -334,10 +339,11 @@ void Server::loop()
 						std::cerr << "Failed to accept new client: " << std::strerror(errno) << std::endl;
 						continue;
 					}
+					fcntl(client_fd, F_SETFL, O_NONBLOCK); // make client socket non-blocking
 					std::cout << "New connection accepted!" << std::endl;
 
-					std::string welcome = "Welcome to our IRC server 🌎!\r\n";
-					send(client_fd, welcome.c_str(), welcome.length(), 0);
+					std::string welcome = "Welcome to our IRC server 🌎!\r\n"; // TODO remove this
+					send(client_fd, welcome.c_str(), welcome.length(), 0); // TODO remove this
 					pollfd newclient_pollfd = {client_fd, POLLIN | POLLOUT, 0};
 					poll_fds.push_back(newclient_pollfd);
 					// Cast to sockaddr_in to access sin_addr (choosing IPv4 here!)
@@ -347,10 +353,10 @@ void Server::loop()
 				}
 				else // existing client sends message
 				{
-					char data[512];
+					char data[1000];
 					memset(data, 0, sizeof(data));
 
-					int bytesnum = recv(poll_fds[i].fd, data, 512, 0);
+					int bytesnum = recv(poll_fds[i].fd, data, 1000, 0);
 					if (bytesnum > 0)
 					{
 						std::map<int, Client*>::iterator it_client = _clients.find(poll_fds[i].fd);

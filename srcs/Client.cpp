@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:57:14 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/06 16:28:01 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/08 18:30:01 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,6 +168,7 @@ bool Client::flush()
 	{
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
 			return false; // try again later
+		throw std::runtime_error("Send failed: " + std::string(std::strerror(errno)));
 		return false; // actual problem
 	}
 	_sendBuffer.erase(0, sent);

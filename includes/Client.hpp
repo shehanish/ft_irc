@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/06 12:38:23 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/08 18:30:59 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <set>
 # include <string>
+# include <cstring>
 # include <vector>
 # include <sys/socket.h>
 # include <sys/socket.h>

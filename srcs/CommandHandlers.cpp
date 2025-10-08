@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandlers.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 08:39:57 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/08 17:18:55 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/08 17:58:43 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,7 +164,7 @@ void	Server::handleTopic(Client &client, const std::vector<std::string> &args)
 	broadcastMsg(client, channel, ":alice!~alice@host TOPIC #school :Homework due Monday!"); // to do
 }
 
-static std::vector<std::string>	getModeParams(const std::vector<std::string> &args)
+/* static std::vector<std::string>	getModeParams(const std::vector<std::string> &args)
 {
 	std::vector<std::string>	params;
 	for (size_t i = 1; i < args.size(); i++)
@@ -237,4 +237,4 @@ void	Server::handleMode(Client &client, const std::vector<std::string> &args)
 		
 	}
 	
-}
+} */
