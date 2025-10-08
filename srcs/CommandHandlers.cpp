@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 08:39:57 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/08 17:09:35 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/08 17:18:55 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,7 +167,7 @@ void	Server::handleTopic(Client &client, const std::vector<std::string> &args)
 static std::vector<std::string>	getModeParams(const std::vector<std::string> &args)
 {
 	std::vector<std::string>	params;
-	for (int i = 1; i < args.size(); i++)
+	for (size_t i = 1; i < args.size(); i++)
 	{
 		if (args[i][0] != '+' && args[i][0] != '-')
 			params.push_back(args[i]);
@@ -186,11 +186,11 @@ void	Server::handleMode(Client &client, const std::vector<std::string> &args)
 	if (!channel->isOperator(client))
 		return; // 482 ERR_CHANOPRIVSNEEDED
 	std::vector<std::string>	params = getModeParams(args);
-	int	indexParams = 0;
-	for (int i = 1; i < args.size(); i++)
+	size_t	indexParams = 0;
+	for (size_t i = 1; i < args.size(); i++)
 	{
 		std::string::const_iterator	it = args[i].begin();
-		for (it; it != args[i].end(); it ++)
+		for (; it != args[i].end(); it ++)
 		{
 			char	c = *it;
 			if (c == '+')
