@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/08 18:45:59 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/09 14:23:53 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,7 +195,7 @@ bool Server::parse(std::string &msg, Client *client)
 		return true; // should be "silently ignored"
 	else if (len > 512)
 	{
-		client->queueMsg(":localhost 417 " + client->getNick() + " :Input too long\r\n");
+		client->queueMsg(":ircserv.localhost 417 " + client->getNick() + " :Input too long\r\n");
 		return false;
 	}
 
@@ -231,7 +231,7 @@ bool Server::parse(std::string &msg, Client *client)
         cmd = msg.substr(cmd_start, cmd_end - cmd_start);
 	}
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper); // convert to capitals
-	std::cout << "The command is: " << cmd << std::endl;
+	std::cout << "The command is: " << cmd << std::endl; // TODO remove this
 	if (cmd_end == std::string::npos)
 		pos = msg.size();
 	else
@@ -242,7 +242,7 @@ bool Server::parse(std::string &msg, Client *client)
 	if (it == _commands.end())
 	{
 		std::cerr << "421 ERR_UNKNOWNCOMMAND" << std::endl;
-		client->queueMsg(":localhost 421 " + client->getNick() + cmd + " :Unknown command"); // TODO make this work
+		client->queueMsg(":ircserv.localhost 421" + client->getNick() + " " + cmd + " :Unknown command"); // TODO does not work in hexchat?
 		return (false);
 	}
 	pos = cmd_end;
@@ -256,7 +256,6 @@ bool Server::parse(std::string &msg, Client *client)
 		if (msg[pos] == ':')
 		{
 			std::string newarg = msg.substr(pos); // include the ':'
-			// problem: According to RFC 2812, the trailing parameter should not include the : itself in the stored argument.
 			data.args.push_back(newarg);
 			break;
 		}
@@ -442,7 +441,7 @@ void	Server::handleNick(Client &client, const std::vector <std::string> &args)
 	
 	if(isNickTaken(nickname))
 	{
-		std::cerr << "Nick name has already taken!" << std::endl;
+		std::cerr << "Nickname is already taken!" << std::endl;
 		return;
 	}
 	client.setNick(nickname);
