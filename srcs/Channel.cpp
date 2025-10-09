@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/08 17:49:01 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/09 07:46:47 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,9 +61,12 @@ void	Channel::addUser(Client &user)
 	_members.insert(&user);
 }
 
-void	Channel::addOperator(Client &user)
+void	Channel::addOperator(Client &user, bool setOp)
 {
-	_operators.insert(&user);
+	if (setOp)
+		_operators.insert(&user);
+	else if (!setOp && !isOperator(user))
+		this->delOperator(user);
 }
 
 void	Channel::delUser(Client &user)
@@ -191,10 +194,10 @@ Channel::LimitMode	Channel::hasLimit()
 	return _limit;
 }
 
-void	Channel::setLimit(int &newLimit)
+void	Channel::setLimit(const int &newLimit, bool setLimit)
 {
-	_limit.active = true;
-	_limit.value = newLimit;	
+	_limit.active = setLimit;
+	_limit.value = newLimit;
 }
 
 int	Channel::getLimit()

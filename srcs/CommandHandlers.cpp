@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandlers.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 08:39:57 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/08 18:18:08 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/09 07:47:37 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Server.hpp"
+#include <cstdlib>
 
 void	Server::handleJoin(Client &client, const std::vector<std::string> &args)
 {
@@ -236,19 +237,22 @@ void	Server::handleMode(Client &client, const std::vector<std::string> &args)
 				case 'o':
 					Client	*user = NULL;
 					if (indexParams < params.size())
-						user = getUser(params[indexParams]);
+						user = getUser(params[indexParams++]);
 					else
-						return; // not on channel
+						return; // not enough 
 					if (channel->isMember(*user))
 					{
-						if (adding)
-							channel->addOperator(client);
-						else
-							channel->delInvitation(client);
+						channel->addOperator(*user, adding);
 					}
 					break;
 				case 'l':
-					
+					if (adding && indexParams < params.size())
+					{
+						channel->setLimit(atoi(params[indexParams++].c_str()));
+					}
+					else
+						channel->setLimit(0, adding);
+					break;
 			}
 		}
 	}
