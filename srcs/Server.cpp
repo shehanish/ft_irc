@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/09 14:23:53 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/10 16:36:42 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,99 +188,115 @@ int Server::setUpSocket()
  */
 bool Server::parse(std::string &msg, Client *client)
 {
-	s_data data;
-	
-	int len = msg.size();
-	if (len == 0)
-		return true; // should be "silently ignored"
-	else if (len > 512)
-	{
-		client->queueMsg(":ircserv.localhost 417 " + client->getNick() + " :Input too long\r\n");
-		return false;
-	}
+    int len = msg.size();
+    if (len == 0)
+        return true; // silently ignore empty messages
+    else if (len > 512)
+        return false; // max IRC message length
 
-	size_t pos = 0;
-	
-	// extract prefix
-	if (msg[0] == ':')
+    // Trim \r\n
+    size_t end = msg.find_last_not_of("\r\n");
+    if (end == std::string::npos)
+        return true; // only \r\n
+    msg = msg.substr(0, end + 1);
+
+    size_t pos = 0;
+
+    // Extract prefix if present (optional)
+    if (msg[0] == ':')
+    {
+        size_t space_pos = msg.find(' ');
+        if (space_pos == std::string::npos)
+            return false; // invalid
+        std::string prefix = msg.substr(1, space_pos - 1);
+        pos = space_pos + 1;
+    }
+
+    while (pos < msg.size() && msg[pos] == ' ')
+        pos++;
+
+    if (pos >= msg.size())
+        return false; // no command
+
+    // Extract command
+    size_t cmd_end = msg.find(' ', pos);
+    std::string cmd = (cmd_end == std::string::npos) ? msg.substr(pos) : msg.substr(pos, cmd_end - pos);
+    std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper);
+
+    pos = (cmd_end == std::string::npos) ? msg.size() : cmd_end + 1;
+
+    // Parse arguments
+    std::vector<std::string> args;
+    while (pos < msg.size())
+    {
+        while (pos < msg.size() && msg[pos] == ' ')
+            pos++;
+        if (pos >= msg.size()) break;
+
+        if (msg[pos] == ':')
+        {
+            args.push_back(msg.substr(pos + 1)); // skip ':'
+            break;
+        }
+        size_t next_space = msg.find(' ', pos);
+        if (next_space == std::string::npos)
+        {
+            args.push_back(msg.substr(pos));
+            break;
+        }
+        args.push_back(msg.substr(pos, next_space - pos));
+        pos = next_space + 1;
+    }
+
+	if (cmd == "PASS")
 	{
-		size_t space_pos = msg.find(' ');
-		if (space_pos == std::string::npos)
-			return false; // : without prefix
-		data.prefix = msg.substr(1, space_pos - 1);
-		std::cout << "The prefix is: " << data.prefix << std::endl; // TODO remove this
-		pos = space_pos;
+		std::cout << "Check Pass" << std::endl;
+		handlePass(*client, args);
 	}
-	while (pos < msg.size() && msg[pos] == ' ')
-		pos++;
-	if (pos >= msg.size())
+	else if (cmd == "NICK")
 	{
-		std::cerr << "No command found" << std::endl; // TODO should be ignored actually 
-		return false;
+		handleNick(*client, args);
 	}
-	
-	// extract command
-	size_t cmd_start = pos;
-    size_t cmd_end = msg.find(' ', cmd_start);
-	
-	std::string cmd;
-    if (cmd_end == std::string::npos)
-        cmd = msg.substr(cmd_start);
+	else if (cmd == "USER")
+	{
+		handleUser(*client, args);
+	}
+    else if (cmd == "CAP")
+    {
+        handleCap(*client, args);
+    }
     else
-	{
-        cmd = msg.substr(cmd_start, cmd_end - cmd_start);
-	}
-	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper); // convert to capitals
-	std::cout << "The command is: " << cmd << std::endl; // TODO remove this
-	if (cmd_end == std::string::npos)
-		pos = msg.size();
-	else
-		pos = cmd_end;
+    {
+        std::cerr << "Unknown command: " << cmd << std::endl;
+    }
 
-	// look up command
-	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
-	if (it == _commands.end())
-	{
-		std::cerr << "421 ERR_UNKNOWNCOMMAND" << std::endl;
-		client->queueMsg(":ircserv.localhost 421" + client->getNick() + " " + cmd + " :Unknown command"); // TODO does not work in hexchat?
-		return (false);
-	}
-	pos = cmd_end;
-	
-	// parse args
-	data.args.reserve(10); 
-    while (pos < msg.size())	
-	{
-		while (pos < msg.size() && msg[pos] == ' ')
-			pos++;
-		if (msg[pos] == ':')
-		{
-			std::string newarg = msg.substr(pos); // include the ':'
-			data.args.push_back(newarg);
-			break;
-		}
-		else
-		{
-			size_t next_space = msg.find(' ', pos);
-			if (next_space == std::string::npos)
-            {
-                data.args.push_back(msg.substr(pos));
-                break;
-            }
-			std::string nextarg = msg.substr(pos, next_space - pos);
-			data.args.push_back(nextarg);
-			pos = next_space;
-		}
-	}
-	// TODO remove this (prints args)
-	for (size_t i = 0; i < data.args.size(); i++)
-	{
-		std::cout << "Arg " << i + 1 << ": " << data.args[i] << std::endl;
-	}
-	
-	// pass to execute
-	it->second->execute(*this, *client, data);
-	return true;
+    return true;
+}
+
+void Server::handleCap(Client &client, const std::vector<std::string> &args)
+{
+    if (args.empty())
+        return;
+
+    std::string subCmd = args[0];
+
+    if (subCmd == "LS")
+    {
+        // Reply only once when the client asks for capabilities
+        std::string reply = ":localhost CAP * LS :\r\n"; // No supported capabilities
+        send(client.getFd(), reply.c_str(), reply.size(), 0);
+        std::cout << "Handled CAP LS for client " << client.getFd() << std::endl;
+    }
+    else if (subCmd == "END")
+    {
+        // Just note that the CAP negotiation ended
+        std::cout << "Client " << client.getFd() << " ended CAP negotiation." << std::endl;
+    }
+    else
+    {
+        // Ignore other CAP subcommands silently
+        std::cout << "Ignoring CAP " << subCmd << " from client " << client.getFd() << std::endl;
+    }
 }
 
 void Server::serverInit()
@@ -402,11 +418,11 @@ void	Server::broadcastMsg(Client &source, Channel *channel, const std::string &m
 
 void	Server::handlePass(Client &client, const std::vector<std::string> &args)
 {
-	if(client.isAuthenticated())
-	{
-		std::cerr << "462 ERR_ALREADYREGISTRED" << std::endl;
-		return; 
-	}
+	// if(client.isAuthenticated())
+	// {
+	// 	std::cerr << "462 ERR_ALREADYREGISTRED" << std::endl;
+	// 	return; 
+	// }
 	if(args.empty())
 	{
 		std::cerr << "461 ERR_NEEDMOREPARAMS" <<std::endl;
@@ -448,6 +464,22 @@ void	Server::handleNick(Client &client, const std::vector <std::string> &args)
 	std::cout << "Nickname set to  " << nickname << std::endl;
 }
 
+void Server::sendWelcome(Client &client)
+{
+    std::string nick = client.getNick();
+    std::string welcome = ":ircserv 001 " + nick + " :Welcome to the IRC server " + nick + "\r\n";
+    client.appendToSendBuffer(welcome);
+
+    std::string host = ":ircserv 002 " + nick + " :Your host is ircserv, running version 1.0\r\n";
+    client.appendToSendBuffer(host);
+
+    std::string created = ":ircserv 003 " + nick + " :This server was created today\r\n";
+    client.appendToSendBuffer(created);
+
+    std::string info = ":ircserv 004 " + nick + " ircserv 1.0 o o\r\n";
+    client.appendToSendBuffer(info);
+}
+
 void Server::registerClient(Client &client)
 {
     if (client.isRegistered())
@@ -461,10 +493,10 @@ void Server::registerClient(Client &client)
 
     // Send welcome numerics (later)
     std::cout << "Client registered: " 
-              << client.getNick() << "!" << client.getUserName() << std::endl;
+              << client.getNick() << "!" 
+			  << client.getUserName() << std::endl;
+	sendWelcome(client); // send IRC numeric messages 001-004
 }
-
-
 void Server::handleUser(Client &client, const std::vector<std::string> &args)
 {
     if (args.size() < 4)

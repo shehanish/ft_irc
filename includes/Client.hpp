@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/08 18:30:59 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/10 16:21:07 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ class Client
 		std::string getRecvBuffer() const;
 		std::string getSendBuffer() const;
 		bool isAuthenticated() const;
+		bool   setRegistered(bool value);
 		int getNbChannel() const;
 		std::set<Channel *> getUserChannel() const;
 		bool hasChannel(Channel *channel) const;
@@ -83,14 +84,13 @@ class Client
 		// Message handling
 		std::vector<std::string> receiveData(const char *data, size_t len);
 		bool flush();
-		// void appendToSendBuffer(const std::string& data);
+		void appendToSendBuffer(const std::string& data);
 		// void clearSendBuffer();
 		void queueMsg(const std::string &msg); 
 		void sendMsg(Client &client, const std::string &msg);
 
 		//Registration
-		bool    isRegistered() const { return _isRegistered; }
-		bool    setRegistered(bool value) {_isRegistered = value; return _isRegistered;}
+		bool    isRegistered() const { return _isRegistered; };
 };
 
 #endif

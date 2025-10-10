@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/08 18:39:36 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/10 15:21:17 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,11 +93,11 @@ class Server
 		// void	handleMode(Client &client, const std::vector<std::string> &args);
 		void	handlePass(Client &client, const std::vector<std::string> &args);
 		void 	handleUser(Client &client, const std::vector<std::string> &args);
-		
+		void 	handleCap(Client &client, const std::vector<std::string> &args);
 		bool	isNickTaken(const std::string &nickname) const;
 		void	registerClient(Client &client);
 		Channel	*createChannel(const std::string &channel, Client &creator);
-
+		void 	sendWelcome(Client &client);
 		
 		// MEMBER FUNCTIONS
 		
