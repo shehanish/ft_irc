@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/09 07:46:47 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/11 08:55:11 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ Channel::~Channel()
 
 void	Channel::addUser(Client &user)
 {
-	if (_limit.active && static_cast<size_t>(_limit.value) >= _members.size()) // TODO bigger then or smaller then?
+	if (_limit.active && static_cast<size_t>(_limit.value) >= _members.size())
 	{
 		const std::string	msg = "Channel limit reached"; //check IRC docs
 		send(user.getFd(), msg.c_str(), msg.size(), 0);

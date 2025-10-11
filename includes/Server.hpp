@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/06 12:36:24 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/08 18:39:36 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <algorithm>
 # include <errno.h>
 # include <iostream>
+# include <fcntl.h>
 # include <algorithm>
 # include <map>
 # include <vector>
@@ -33,8 +34,13 @@
 # include <sys/socket.h>
 # include <sys/types.h>
 
-
 class	Channel;
+
+struct s_data 
+{
+	std::string					prefix;
+	std::vector<std::string>	args;
+};
 
 class Server
 {
@@ -84,7 +90,7 @@ class Server
 		void	handleNick(Client &client, const std::vector<std::string> &args);
 		void	handleInvite(Client &client, const std::vector<std::string> &args);
 		void	handleTopic(Client &client, const std::vector<std::string> &args);
-		void	handleMode(Client &client, const std::vector<std::string> &args);
+		// void	handleMode(Client &client, const std::vector<std::string> &args);
 		void	handlePass(Client &client, const std::vector<std::string> &args);
 		void 	handleUser(Client &client, const std::vector<std::string> &args);
 		
@@ -97,7 +103,7 @@ class Server
 		
 		void serverInit();
 		void loop(); // main loop
-		bool parse(std::string msg, Client *client);
+		bool parse(std::string &msg, Client *client);
 		void cleanup();
 		void broadcastMsg(Client &client, Channel *channel, const std::string &msg);
 };

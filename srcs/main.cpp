@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 15:30:19 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/03 14:14:58 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/06 18:20:23 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ int main (int argc, char** argv)
     }
     Server server(argv[1], argv[2]);
     signal(SIGINT, signalhandler);
+    signal(SIGTERM, signalhandler);
     server.loop();
     return (0);
     

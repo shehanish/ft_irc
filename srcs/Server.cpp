@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/06 12:52:21 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/09 14:23:53 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,7 @@ extern volatile sig_atomic_t signalreceived;
 
 // CONSTRUCTORS
 
-Server::Server()
-{
-	// serverInit();
-}
+Server::Server() {}
 
 Server::Server(char *port, const std::string& password) : _port(port), _password(password), _adlen(sizeof(_specs))
 {
@@ -63,8 +60,17 @@ Server::~Server()
     _commands.clear();
 	for (std::map<int, Client*>::iterator cit = _clients.begin(); 
          cit != _clients.end(); ++cit)
-        delete cit->second;
+	{
+        int fd = cit->first;
+		close(fd);
+		delete cit->second;
+	}
 	_clients.clear();
+	if (_serverfd != -1)
+	{
+		close(_serverfd);
+		_serverfd = -1;
+	}
 }
 
 // GETTERS AND SETTERS
@@ -140,9 +146,12 @@ int Server::setUpSocket()
 	_specs.ai_flags = AI_PASSIVE; // fill in my IP for me
 	_adlen = sizeof(_specs);
 
-	if (getaddrinfo(NULL, _port, &_specs, &_servinfo) != 0)
+	int status = getaddrinfo(NULL, _port, &_specs, &_servinfo);
+	if (status != 0)
+	{
+		std::cerr << "getaddrinfo error: " << gai_strerror(status) << std::endl;
 		throw std::runtime_error("Error: filling serverinfo struct with address infomation failed");
-
+	}
 	_serverfd = socket(_servinfo->ai_family, _servinfo->ai_socktype, _servinfo->ai_protocol); 
 	if(_serverfd < 0)
 		throw std::runtime_error("Error: Could not create socket");
@@ -164,6 +173,7 @@ int Server::setUpSocket()
 }
 
 // use nc for testing
+// example: echo -e "PASS mysecret\r\nNICK anna\r\nUSER anna 0 * :Anna Example\r\n" | nc localhost 6667
 
 /**
  * @brief Parses the extracted message into the components <prefix>, <command> and list of parameters (<params>)..
@@ -176,20 +186,20 @@ int Server::setUpSocket()
  *
  * @note More detailed error handling still needs to be implemented
  */
-bool Server::parse(std::string msg, Client *client)
+bool Server::parse(std::string &msg, Client *client)
 {
+	s_data data;
+	
 	int len = msg.size();
 	if (len == 0)
 		return true; // should be "silently ignored"
 	else if (len > 512)
-		return false; // see rules	
+	{
+		client->queueMsg(":ircserv.localhost 417 " + client->getNick() + " :Input too long\r\n");
+		return false;
+	}
 
 	size_t pos = 0;
-	
-	size_t end = msg.find_last_not_of("\r\n"); // trim /r/n
-	if (end == std::string::npos)
-    	return true; // String was only \r\n characters
-	msg = msg.substr(0, end + 1);
 	
 	// extract prefix
 	if (msg[0] == ':')
@@ -197,15 +207,17 @@ bool Server::parse(std::string msg, Client *client)
 		size_t space_pos = msg.find(' ');
 		if (space_pos == std::string::npos)
 			return false; // : without prefix
-		std::string prefix = msg.substr(1, space_pos - 1);
-		std::cout << "The prefix is: " << prefix << std::endl;
+		data.prefix = msg.substr(1, space_pos - 1);
+		std::cout << "The prefix is: " << data.prefix << std::endl; // TODO remove this
 		pos = space_pos;
-		// check whether prefix is valid or do whatever is necessary
 	}
 	while (pos < msg.size() && msg[pos] == ' ')
 		pos++;
 	if (pos >= msg.size())
-		return false; // no command found
+	{
+		std::cerr << "No command found" << std::endl; // TODO should be ignored actually 
+		return false;
+	}
 	
 	// extract command
 	size_t cmd_start = pos;
@@ -219,21 +231,24 @@ bool Server::parse(std::string msg, Client *client)
         cmd = msg.substr(cmd_start, cmd_end - cmd_start);
 	}
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper); // convert to capitals
-	std::cout << "The command is: " << cmd << std::endl;
+	std::cout << "The command is: " << cmd << std::endl; // TODO remove this
+	if (cmd_end == std::string::npos)
+		pos = msg.size();
+	else
+		pos = cmd_end;
 
 	// look up command
 	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
 	if (it == _commands.end())
 	{
-		std::cout << "Command has not yet been implemented" << std::endl; // TODO remove this and uncomment following line
-		// return (false); // unknown or invalid command
+		std::cerr << "421 ERR_UNKNOWNCOMMAND" << std::endl;
+		client->queueMsg(":ircserv.localhost 421" + client->getNick() + " " + cmd + " :Unknown command"); // TODO does not work in hexchat?
+		return (false);
 	}
-	
 	pos = cmd_end;
-
 	
 	// parse args
-	std::vector<std::string> args;
+	data.args.reserve(10); 
     while (pos < msg.size())	
 	{
 		while (pos < msg.size() && msg[pos] == ' ')
@@ -241,7 +256,7 @@ bool Server::parse(std::string msg, Client *client)
 		if (msg[pos] == ':')
 		{
 			std::string newarg = msg.substr(pos); // include the ':'
-			args.push_back(newarg);
+			data.args.push_back(newarg);
 			break;
 		}
 		else
@@ -249,23 +264,22 @@ bool Server::parse(std::string msg, Client *client)
 			size_t next_space = msg.find(' ', pos);
 			if (next_space == std::string::npos)
             {
-                args.push_back(msg.substr(pos));
+                data.args.push_back(msg.substr(pos));
                 break;
             }
 			std::string nextarg = msg.substr(pos, next_space - pos);
-			args.push_back(nextarg);
+			data.args.push_back(nextarg);
 			pos = next_space;
 		}
 	}
-	// print args
-	for (size_t i = 0; i < args.size(); i++)
+	// TODO remove this (prints args)
+	for (size_t i = 0; i < data.args.size(); i++)
 	{
-		std::cout << "Arg " << i + 1 << ": " << args[i] << std::endl;
+		std::cout << "Arg " << i + 1 << ": " << data.args[i] << std::endl;
 	}
 	
 	// pass to execute
-	// it->second->execute(*this, *client, args);
-	(void)*client; // TODO change this and uncomment the above
+	it->second->execute(*this, *client, data);
 	return true;
 }
 
@@ -278,6 +292,9 @@ void Server::serverInit()
 	_commands["INVITE"] = new InviteCmd();
 	_commands["TOPIC"] = new TopicCmd();
 	_commands["MODE"] = new ModeCmd();
+	_commands["PASS"] = new PassCmd();
+	_commands["NICK"] = new NickCmd();
+	_commands["USER"] = new UserCmd();
 }
 
 /**
@@ -303,6 +320,8 @@ void Server::loop()
 	{
 		if (poll(poll_fds.data(), poll_fds.size(), -1) < 0)
 		{
+			if (errno == EINTR)
+				continue; // interrupted by signal: just retry
 			std::cerr << "Poll error: " << std::strerror(errno) << std::endl;
 			continue;
 		}
@@ -319,10 +338,11 @@ void Server::loop()
 						std::cerr << "Failed to accept new client: " << std::strerror(errno) << std::endl;
 						continue;
 					}
+					fcntl(client_fd, F_SETFL, O_NONBLOCK); // make client socket non-blocking
 					std::cout << "New connection accepted!" << std::endl;
 
-					// std::string welcome = "Welcome to our IRC server 🌎!\r\n";
-					// send(client_fd, welcome.c_str(), welcome.length(), 0);
+					std::string welcome = "Welcome to our IRC server 🌎!\r\n"; // TODO remove this
+					send(client_fd, welcome.c_str(), welcome.length(), 0); // TODO remove this
 					pollfd newclient_pollfd = {client_fd, POLLIN | POLLOUT, 0};
 					poll_fds.push_back(newclient_pollfd);
 					// Cast to sockaddr_in to access sin_addr (choosing IPv4 here!)
@@ -332,20 +352,18 @@ void Server::loop()
 				}
 				else // existing client sends message
 				{
-					char data[512]; // check irc documentation and double check recv
+					char data[1000];
 					memset(data, 0, sizeof(data));
 
-					int bytesnum = recv(poll_fds[i].fd, data, 512, 0);
+					int bytesnum = recv(poll_fds[i].fd, data, 1000, 0);
 					if (bytesnum > 0)
 					{
-						// std::string msg(message, bytesnum);
-						// std::cout << "Received from client: " << msg;
 						std::map<int, Client*>::iterator it_client = _clients.find(poll_fds[i].fd);
 						std::vector<std::string> msgs = it_client->second->receiveData(data, bytesnum);
 						for (size_t i = 0; i < msgs.size(); i++)
 							parse(msgs[i], it_client->second);
 					}
-					else if (bytesnum == 0)
+					else if (bytesnum == 0) // handles Ctrl-D signal
 					{
 						std::cout << "Client " << poll_fds[i].fd << " hung up" << std::endl;
 						close(poll_fds[i].fd);
@@ -379,7 +397,7 @@ void	Server::broadcastMsg(Client &source, Channel *channel, const std::string &m
 {
 	std::set<Client*>::iterator	sit = channel->getMembers().begin();
 	for (; sit != channel->getMembers().end(); sit++)
-		(*sit)->sendMsg(source, msg); //send msg needs to be adapted to also send prefix // TODO check i added source here
+		(*sit)->sendMsg(source, msg); // TODO send msg needs to be adapted to also send prefix 
 }
 
 void	Server::handlePass(Client &client, const std::vector<std::string> &args)
@@ -423,7 +441,7 @@ void	Server::handleNick(Client &client, const std::vector <std::string> &args)
 	
 	if(isNickTaken(nickname))
 	{
-		std::cerr << "Nick name has already taken!" << std::endl;
+		std::cerr << "Nickname is already taken!" << std::endl;
 		return;
 	}
 	client.setNick(nickname);
