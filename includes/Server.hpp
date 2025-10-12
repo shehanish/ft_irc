@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/08 18:39:36 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/12 13:24:07 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ class Server
 		void	handleNick(Client &client, const std::vector<std::string> &args);
 		void	handleInvite(Client &client, const std::vector<std::string> &args);
 		void	handleTopic(Client &client, const std::vector<std::string> &args);
-		// void	handleMode(Client &client, const std::vector<std::string> &args);
+		void	handleMode(Client &client, const std::vector<std::string> &args);
 		void	handlePass(Client &client, const std::vector<std::string> &args);
 		void 	handleUser(Client &client, const std::vector<std::string> &args);
 		
