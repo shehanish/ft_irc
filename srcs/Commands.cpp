@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 17:28:05 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/08 17:58:21 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/13 16:38:08 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,11 @@ void NickCmd::execute(Server &server, Client &client, s_data &data)
 }
 
 void UserCmd::execute(Server &server, Client &client, s_data &data)
-{
+qqqq{
 	server.handleUser(client, data.args);
+}
+
+void WhoCmd::execute(Server &server, Client &client, s_data &data)
+{
+	server.handleWho(client, data.args);
 }

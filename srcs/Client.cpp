@@ -6,7 +6,7 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:57:14 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/10 16:37:31 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/13 15:41:26 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,7 @@ void	Client::setSendBuffer(const std::string& sendbuffer)
 
 void Client::setIsAuthenticated(bool value)
 {
-	std::cout << "Client is Authenticated" << std::endl;
+	// std::cout << "Client is Authenticated" << std::endl;
     _isAuthenticated = value;
 }
 
@@ -181,7 +181,7 @@ bool Client::flush()
 }
 bool    Client::setRegistered(bool value)
 {
-	std::cout << "Client is Registered!" << std::endl;
+	// std::cout << "Client is Registered!" << std::endl;
 	_isRegistered= value; 
 	return _isRegistered;
 }
