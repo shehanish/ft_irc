@@ -6,7 +6,7 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/13 16:37:28 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/14 14:49:48 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ Server::Server() {}
 
 Server::Server(char *port, const std::string& password) : _port(port), _password(password), _adlen(sizeof(_specs))
 {
-	// std::cout << "Server starting... 🟢" << std::endl;
+	std::cout << "Server starting... 🟢" << std::endl;
+	std::cout << "Waiting for the client.... " << std::endl;
 	serverInit();
 	setUpSocket();
 }
@@ -48,7 +49,7 @@ Server& Server::operator=(const Server& other)
 
 Server::~Server() 
 {
-	// std::cout << "Server shutting down 🔴" << std::endl;
+	std::cout << "Server shutting down 🔴" << std::endl;
 	for (std::map<std::string, Channel*>::iterator mit = _channels.begin(); mit != _channels.end(); mit++)
 		delete mit->second;
 	_channels.clear();
@@ -409,9 +410,18 @@ void Server::loop()
 						for (size_t j = 0; j < msgs.size(); j++)
 							parse(msgs[j], it_client->second);
 						
-						// If there's data to send, enable POLLOUT
-						if (!it_client->second->getSendBuffer().empty())
-							poll_fds[i].events |= POLLOUT;
+						// After parsing commands, check ALL clients for pending data to send
+						// This is important for broadcasts (PRIVMSG to channels, JOIN notifications, etc.)
+						for (size_t k = 1; k < poll_fds.size(); k++)
+						{
+							std::map<int, Client*>::iterator check_client = _clients.find(poll_fds[k].fd);
+							if (check_client != _clients.end() && !check_client->second->getSendBuffer().empty())
+							{
+								// Only enable POLLOUT if not already enabled
+								if (!(poll_fds[k].events & POLLOUT))
+									poll_fds[k].events |= POLLOUT;
+							}
+						}
 					}
 					else if (bytesnum == 0) // handles Ctrl-D signal
 					{

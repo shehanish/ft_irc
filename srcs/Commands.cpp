@@ -6,7 +6,7 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 17:28:05 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/13 16:38:08 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/14 15:07:11 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,7 @@ void TopicCmd::execute(Server &server, Client &client, s_data &data)
 
 void ModeCmd::execute(Server &server, Client &client, s_data &data)
 {
-	// server.handleMode(client, data.args);
-	server.handleTopic(client, data.args); // TODO remove this
+	server.handleMode(client, data.args);
 }
 
 void PassCmd::execute(Server &server, Client &client, s_data &data)
@@ -59,7 +58,7 @@ void NickCmd::execute(Server &server, Client &client, s_data &data)
 }
 
 void UserCmd::execute(Server &server, Client &client, s_data &data)
-qqqq{
+{
 	server.handleUser(client, data.args);
 }
 
