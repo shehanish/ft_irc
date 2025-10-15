@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Commands.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/18 07:38:28 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/08 17:12:12 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/13 16:37:28 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,11 @@ class NickCmd	: public Command
 };
 
 class UserCmd	: public Command
+{
+	void execute(Server &server, Client &client, s_data &data);
+};
+
+class WhoCmd	: public Command
 {
 	void execute(Server &server, Client &client, s_data &data);
 };

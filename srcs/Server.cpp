@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/09 14:23:53 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/14 14:49:48 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ Server::Server() {}
 Server::Server(char *port, const std::string& password) : _port(port), _password(password), _adlen(sizeof(_specs))
 {
 	std::cout << "Server starting... 🟢" << std::endl;
+	std::cout << "Waiting for the client.... " << std::endl;
 	serverInit();
 	setUpSocket();
 }
@@ -66,11 +67,6 @@ Server::~Server()
 		delete cit->second;
 	}
 	_clients.clear();
-	if (_serverfd != -1)
-	{
-		close(_serverfd);
-		_serverfd = -1;
-	}
 }
 
 // GETTERS AND SETTERS
@@ -149,7 +145,7 @@ int Server::setUpSocket()
 	int status = getaddrinfo(NULL, _port, &_specs, &_servinfo);
 	if (status != 0)
 	{
-		std::cerr << "getaddrinfo error: " << gai_strerror(status) << std::endl;
+		// std::cerr << "getaddrinfo error: " << gai_strerror(status) << std::endl;
 		throw std::runtime_error("Error: filling serverinfo struct with address infomation failed");
 	}
 	_serverfd = socket(_servinfo->ai_family, _servinfo->ai_socktype, _servinfo->ai_protocol); 
@@ -166,7 +162,7 @@ int Server::setUpSocket()
 	if (listen(_serverfd, SOMAXCONN) < 0) // SOMAXCONN means that the max of 128 incoming connections can be queued
 		throw std::runtime_error("Error: Could not put socket in listening mode");
 
-	std::cout << "Server ready and listening on port " << _port << std::endl;
+	// std::cout << "Server ready and listening on port " << _port << std::endl;
 
 	freeaddrinfo(_servinfo);
 	return (0);
@@ -188,99 +184,149 @@ int Server::setUpSocket()
  */
 bool Server::parse(std::string &msg, Client *client)
 {
-	s_data data;
-	
-	int len = msg.size();
-	if (len == 0)
-		return true; // should be "silently ignored"
-	else if (len > 512)
-	{
-		client->queueMsg(":ircserv.localhost 417 " + client->getNick() + " :Input too long\r\n");
-		return false;
-	}
+    int len = msg.size();
+    if (len == 0)
+        return true; // silently ignore empty messages
+    else if (len > 512)
+        return false; // max IRC message length
 
-	size_t pos = 0;
-	
-	// extract prefix
-	if (msg[0] == ':')
+    // Trim \r\n
+    size_t end = msg.find_last_not_of("\r\n");
+    if (end == std::string::npos)
+        return true; // only \r\n
+    msg = msg.substr(0, end + 1);
+
+    size_t pos = 0;
+
+    // Extract prefix if present (optional)
+    if (msg[0] == ':')
+    {
+        size_t space_pos = msg.find(' ');
+        if (space_pos == std::string::npos)
+            return false; // invalid
+        std::string prefix = msg.substr(1, space_pos - 1);
+        pos = space_pos + 1;
+    }
+
+    while (pos < msg.size() && msg[pos] == ' ')
+        pos++;
+
+    if (pos >= msg.size())
+        return false; // no command
+
+    // Extract command
+    size_t cmd_end = msg.find(' ', pos);
+    std::string cmd = (cmd_end == std::string::npos) ? msg.substr(pos) : msg.substr(pos, cmd_end - pos);
+    std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper);
+
+    pos = (cmd_end == std::string::npos) ? msg.size() : cmd_end + 1;
+
+    // Parse arguments
+    std::vector<std::string> args;
+    while (pos < msg.size())
+    {
+        while (pos < msg.size() && msg[pos] == ' ')
+            pos++;
+        if (pos >= msg.size()) break;
+
+        if (msg[pos] == ':')
+        {
+            args.push_back(msg.substr(pos + 1)); // skip ':'
+            break;
+        }
+        size_t next_space = msg.find(' ', pos);
+        if (next_space == std::string::npos)
+        {
+            args.push_back(msg.substr(pos));
+            break;
+        }
+        args.push_back(msg.substr(pos, next_space - pos));
+        pos = next_space + 1;
+    }
+
+	if (cmd == "PASS")
 	{
-		size_t space_pos = msg.find(' ');
-		if (space_pos == std::string::npos)
-			return false; // : without prefix
-		data.prefix = msg.substr(1, space_pos - 1);
-		std::cout << "The prefix is: " << data.prefix << std::endl; // TODO remove this
-		pos = space_pos;
+		// std::cout << "Check Pass" << std::endl;
+		handlePass(*client, args);
 	}
-	while (pos < msg.size() && msg[pos] == ' ')
-		pos++;
-	if (pos >= msg.size())
+	else if (cmd == "NICK")
 	{
-		std::cerr << "No command found" << std::endl; // TODO should be ignored actually 
-		return false;
+		handleNick(*client, args);
 	}
-	
-	// extract command
-	size_t cmd_start = pos;
-    size_t cmd_end = msg.find(' ', cmd_start);
-	
-	std::string cmd;
-    if (cmd_end == std::string::npos)
-        cmd = msg.substr(cmd_start);
+	else if (cmd == "USER")
+	{
+		handleUser(*client, args);
+	}
+    else if (cmd == "CAP")
+    {
+        handleCap(*client, args);
+    }
     else
-	{
-        cmd = msg.substr(cmd_start, cmd_end - cmd_start);
-	}
-	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper); // convert to capitals
-	std::cout << "The command is: " << cmd << std::endl; // TODO remove this
-	if (cmd_end == std::string::npos)
-		pos = msg.size();
-	else
-		pos = cmd_end;
+    {
+        // For all other commands, check if client is registered
+        if (!client->isRegistered())
+        {
+            std::string error = ":localhost 451 * :You have not registered\r\n";
+            client->appendToSendBuffer(error);
+            return true;
+        }
+        
+        // Route through command pattern
+        std::map<std::string, Command*>::iterator it = _commands.find(cmd);
+        if (it != _commands.end())
+        {
+            // Create s_data structure for command execution
+            s_data data;
+            data.prefix = "";
+            data.args = args;
+            it->second->execute(*this, *client, data);
+        }
+        else
+        {
+            std::string error = ":localhost 421 " + client->getNick() + " " + cmd + " :Unknown command\r\n";
+            client->appendToSendBuffer(error);
+        }
+    }
 
-	// look up command
-	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
-	if (it == _commands.end())
-	{
-		std::cerr << "421 ERR_UNKNOWNCOMMAND" << std::endl;
-		client->queueMsg(":ircserv.localhost 421" + client->getNick() + " " + cmd + " :Unknown command"); // TODO does not work in hexchat?
-		return (false);
-	}
-	pos = cmd_end;
-	
-	// parse args
-	data.args.reserve(10); 
-    while (pos < msg.size())	
-	{
-		while (pos < msg.size() && msg[pos] == ' ')
-			pos++;
-		if (msg[pos] == ':')
-		{
-			std::string newarg = msg.substr(pos); // include the ':'
-			data.args.push_back(newarg);
-			break;
-		}
-		else
-		{
-			size_t next_space = msg.find(' ', pos);
-			if (next_space == std::string::npos)
-            {
-                data.args.push_back(msg.substr(pos));
-                break;
-            }
-			std::string nextarg = msg.substr(pos, next_space - pos);
-			data.args.push_back(nextarg);
-			pos = next_space;
-		}
-	}
-	// TODO remove this (prints args)
-	for (size_t i = 0; i < data.args.size(); i++)
-	{
-		std::cout << "Arg " << i + 1 << ": " << data.args[i] << std::endl;
-	}
-	
-	// pass to execute
-	it->second->execute(*this, *client, data);
-	return true;
+    return true;
+}
+
+void Server::handleCap(Client &client, const std::vector<std::string> &args)
+{
+    if (args.empty())
+        return;
+
+    std::string subCmd = args[0];
+
+    if (subCmd == "LS")
+    {
+        // Reply with capability list (empty for now - no capabilities supported)
+        // HexChat sends "CAP LS 302" so it might include version number in args[1]
+        std::string reply = ":localhost CAP * LS :\r\n";
+        client.appendToSendBuffer(reply);
+	// std::cout << "Handled CAP LS for client " << client.getFd() << std::endl;
+    }
+    else if (subCmd == "END")
+    {
+        // CAP negotiation ended, client is ready to proceed with registration
+	// std::cout << "Client " << client.getFd() << " ended CAP negotiation." << std::endl;
+        // Try to complete registration in case PASS/NICK/USER were already sent
+        registerClient(client);
+    }
+    else if (subCmd == "REQ")
+    {
+        // Client requesting capabilities - we don't support any yet
+        if (args.size() > 1)
+        {
+            std::string reply = ":localhost CAP * NAK :" + args[1] + "\r\n";
+            client.appendToSendBuffer(reply);
+        }
+    }
+    else
+    {
+        // Ignore other CAP subcommands silently
+	// std::cout << "Ignoring CAP " << subCmd << " from client " << client.getFd() << std::endl;
+    }
 }
 
 void Server::serverInit()
@@ -295,6 +341,7 @@ void Server::serverInit()
 	_commands["PASS"] = new PassCmd();
 	_commands["NICK"] = new NickCmd();
 	_commands["USER"] = new UserCmd();
+	_commands["WHO"] = new WhoCmd();
 }
 
 /**
@@ -360,8 +407,21 @@ void Server::loop()
 					{
 						std::map<int, Client*>::iterator it_client = _clients.find(poll_fds[i].fd);
 						std::vector<std::string> msgs = it_client->second->receiveData(data, bytesnum);
-						for (size_t i = 0; i < msgs.size(); i++)
-							parse(msgs[i], it_client->second);
+						for (size_t j = 0; j < msgs.size(); j++)
+							parse(msgs[j], it_client->second);
+						
+						// After parsing commands, check ALL clients for pending data to send
+						// This is important for broadcasts (PRIVMSG to channels, JOIN notifications, etc.)
+						for (size_t k = 1; k < poll_fds.size(); k++)
+						{
+							std::map<int, Client*>::iterator check_client = _clients.find(poll_fds[k].fd);
+							if (check_client != _clients.end() && !check_client->second->getSendBuffer().empty())
+							{
+								// Only enable POLLOUT if not already enabled
+								if (!(poll_fds[k].events & POLLOUT))
+									poll_fds[k].events |= POLLOUT;
+							}
+						}
 					}
 					else if (bytesnum == 0) // handles Ctrl-D signal
 					{
@@ -384,8 +444,9 @@ void Server::loop()
 			if (poll_fds[i].revents & POLLOUT)
 			{
 				std::map<int, Client*>::iterator it_client = _clients.find(poll_fds[i].fd);
-				if (it_client->second->flush())
+				if (it_client != _clients.end() && it_client->second->flush())
 				{
+					// Buffer is empty, disable POLLOUT
 					poll_fds[i].events &= ~POLLOUT;
 				}
 			}
@@ -402,28 +463,36 @@ void	Server::broadcastMsg(Client &source, Channel *channel, const std::string &m
 
 void	Server::handlePass(Client &client, const std::vector<std::string> &args)
 {
-	if(client.isAuthenticated())
-	{
-		std::cerr << "462 ERR_ALREADYREGISTRED" << std::endl;
-		return; 
-	}
+	// If already authenticated, ignore subsequent PASS commands
+	if (client.isAuthenticated())
+		return;
+	
 	if(args.empty())
 	{
-		std::cerr << "461 ERR_NEEDMOREPARAMS" <<std::endl;
+		std::string error = ":localhost 461 * PASS :Not enough parameters\r\n";
+		client.appendToSendBuffer(error);
 		return;
 	}
 	if(args[0] != _password)
 	{
-		std::cerr << "464 ERR_PASSWDMISMATCH" << std::endl;
+		std::string error = ":localhost 464 * :Password incorrect\r\n";
+		client.appendToSendBuffer(error);
 		return;
 	}
 	client.setIsAuthenticated(true);
+	
+	// Try to complete registration if NICK and USER were already sent
+	// (This handles cases where HexChat sends NICK/USER before PASS)
+	registerClient(client);
 }
 
-bool	Server::isNickTaken(const std::string &nickname) const
+bool	Server::isNickTaken(const std::string &nickname, const Client *excludeClient) const
 {
 	for(std::map<int, Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
+		// Skip the client that's trying to change their nickname
+		if (excludeClient && it->second == excludeClient)
+			continue;
 		if (it->second->getNick() == nickname)
 			return true;
 	}
@@ -434,60 +503,115 @@ void	Server::handleNick(Client &client, const std::vector <std::string> &args)
 {
 	if(args.empty())
 	{
-		std::cerr << "Empty arguments!" << std::endl;
+		std::string error = ":localhost 431 * :No nickname given\r\n";
+		client.appendToSendBuffer(error);
 		return;
 	}
-	std::string nickname = args[0];
 	
-	if(isNickTaken(nickname))
+	std::string newNickname = args[0];
+	std::string oldNickname = client.getNick();
+	
+	// Check if new nickname is already taken (excluding this client)
+	if(isNickTaken(newNickname, &client))
 	{
-		std::cerr << "Nickname is already taken!" << std::endl;
+		std::string error = ":localhost 433 * " + newNickname + " :Nickname is already in use\r\n";
+		client.appendToSendBuffer(error);
 		return;
 	}
-	client.setNick(nickname);
-	std::cout << "Nickname set to  " << nickname << std::endl;
+	
+	// If client is already registered, send NICK change notification
+	if (client.isRegistered() && !oldNickname.empty())
+	{
+		// Notify the client about their nickname change
+		std::string nickMsg = ":" + oldNickname + "!~" + client.getUserName() + "@localhost NICK :" + newNickname + "\r\n";
+		client.appendToSendBuffer(nickMsg);
+		std::cout << "Nickname changed: " << oldNickname << " → " << newNickname << std::endl;
+	}
+	else
+	{
+		std::cout << "Nickname set to " << newNickname << std::endl;
+	}
+	
+	client.setNick(newNickname);
+	
+	// Try to complete registration after setting nickname (for new connections)
+	// Registration will only succeed if PASS was already sent
+	if (!client.isRegistered())
+		registerClient(client);
+}
+
+void Server::sendWelcome(Client &client)
+{
+    std::string nick = client.getNick();
+    std::string welcome = ":ircserv 001 " + nick + " :Welcome to the IRC server " + nick + "\r\n";
+    client.appendToSendBuffer(welcome);
+
+    std::string host = ":ircserv 002 " + nick + " :Your host is ircserv, running version 1.0\r\n";
+    client.appendToSendBuffer(host);
+
+    std::string created = ":ircserv 003 " + nick + " :This server was created today\r\n";
+    client.appendToSendBuffer(created);
+
+    std::string info = ":ircserv 004 " + nick + " ircserv 1.0 o o\r\n";
+    client.appendToSendBuffer(info);
 }
 
 void Server::registerClient(Client &client)
 {
     if (client.isRegistered())
-        return;
-
+	{
+		return;
+	}
+        
     // Needs ALL 3: authenticated + nick + username
     if (!client.isAuthenticated() || client.getNick().empty() || client.getUserName().empty())
-        return;
-
+	{
+		// Not ready for registration yet
+		return;
+	}
+        
     client.setRegistered(true);
 
-    // Send welcome numerics (later)
+    // Send welcome numerics
     std::cout << "Client registered: " 
-              << client.getNick() << "!" << client.getUserName() << std::endl;
+              << client.getNick() << "!" 
+			  << client.getUserName() << std::endl;
+	sendWelcome(client); // send IRC numeric messages 001-004
 }
-
-
 void Server::handleUser(Client &client, const std::vector<std::string> &args)
 {
     if (args.size() < 4)
     {
-        std::cerr << "461 ERR_NEEDMOREPARAMS (USER)" << std::endl;
-        return;
-    }
-
-    if (!client.getUserName().empty())
-    {
-        std::cerr << "462 ERR_ALREADYREGISTRED (USER)" << std::endl;
+        std::string error = ":localhost 461 * USER :Not enough parameters\r\n";
+        client.appendToSendBuffer(error);
         return;
     }
 
     std::string username = args[0];
-    std::string realname = args[3]; // assuming it's parsed correctly
+    std::string realname = args[3];
+    
+    // If client is already registered, allow username change
+    if (client.isRegistered())
+    {
+        std::string oldUsername = client.getUserName();
+        client.setUserName(username);
+        client.setRealName(realname);
+        
+        // Notify the client about username change
+        std::string msg = ":localhost NOTICE " + client.getNick() + " :Username changed from " + oldUsername + " to " + username + "\r\n";
+        client.appendToSendBuffer(msg);
+        std::cout << "Username changed: " << oldUsername << " → " << username << std::endl;
+        return;
+    }
 
+    // For new clients: set username and try to complete registration
     client.setUserName(username);
     client.setRealName(realname);
 
     std::cout << "User set: " << username << " (" << realname << ")" << std::endl;
 
-    // Try to complete registration (PASS + NICK + USER must be done)
+    // Try to complete registration (PASS + NICK + USER must all be done)
+    // This will silently fail if PASS hasn't been sent yet
     registerClient(client);
 }
 

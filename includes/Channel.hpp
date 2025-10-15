@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/08 17:06:44 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/09 07:44:57 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #define CHANNEL_HPP
 
 # include <set>
-# include "Client.hpp"
+# include "../includes/Client.hpp"
 # include <string>
 # include <sys/socket.h>
 
@@ -42,7 +42,7 @@ class	Channel
 		~Channel();
 
 		void		addUser(Client &user);
-		void		addOperator(Client &user);
+		void		addOperator(Client &user, bool setOp);
 		void		delUser(Client &user);
 		void		delOperator(Client &user);
 		bool		isOperator(Client &user);
@@ -63,7 +63,7 @@ class	Channel
 		void		delInvitation(Client &client);
 		void		addInvitedMember(Client &client);
 		LimitMode	hasLimit();
-		void		setLimit(int &limit);
+		void		setLimit(const int &limit, bool setLimit);
 		int			getLimit();
 		
 	private:
