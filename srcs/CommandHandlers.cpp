@@ -6,7 +6,7 @@
 /*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 08:39:57 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/14 15:07:11 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/16 12:21:29 by shkaruna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -319,52 +319,123 @@ void	Server::handleInvite(Client &client, const std::vector<std::string> &args)
 {
 	// INVITE <nickname> <channel>
 	if (args.size() != 2)
-		return; //send error msg
-	Client	*user = getUser(args[0]);
-	if (!user)
-		return; // 401 ERR_NOSUCHNICK <nickname> :No such nick
-	Channel *channel = getChannel(args[1]);
-	if (!channel)
-		return; // 403 <channel> :No such channel
-	if (!channel->isMember(client))
-		return; // 442 <channel> :You're not on that channel
-	if (channel->isMember(*user))
-		return; // 443 ERR_USERONCHANNEL <nick> <channel> :is already on channel
-	if (channel->isInviteOnly() && !channel->isOperator(client))
-		return; // 482 ERR_CHANOPRIVSNEEDED <channel>
+	{
+		std::string error = ":localhost 461 " + client.getNick() + " INVITE :Not enough parameters\r\n";
+		client.appendToSendBuffer(error);
+		return;
+	}
 	
+	std::string targetNick = args[0];
+	std::string channelName = args[1];
+	
+	Client *user = getUser(targetNick);
+	if (!user)
+	{
+		std::string error = ":localhost 401 " + client.getNick() + " " + targetNick + " :No such nick/channel\r\n";
+		client.appendToSendBuffer(error);
+		return;
+	}
+	
+	Channel *channel = getChannel(channelName);
+	if (!channel)
+	{
+		std::string error = ":localhost 403 " + client.getNick() + " " + channelName + " :No such channel\r\n";
+		client.appendToSendBuffer(error);
+		return;
+	}
+	
+	if (!channel->isMember(client))
+	{
+		std::string error = ":localhost 442 " + client.getNick() + " " + channelName + " :You're not on that channel\r\n";
+		client.appendToSendBuffer(error);
+		return;
+	}
+	
+	if (channel->isMember(*user))
+	{
+		std::string error = ":localhost 443 " + client.getNick() + " " + targetNick + " " + channelName + " :is already on channel\r\n";
+		client.appendToSendBuffer(error);
+		return;
+	}
+	
+	if (channel->isInviteOnly() && !channel->isOperator(client))
+	{
+		std::string error = ":localhost 482 " + client.getNick() + " " + channelName + " :You're not channel operator\r\n";
+		client.appendToSendBuffer(error);
+		return;
+	}
+	
+	// Add user to invite list if channel is invite-only
 	if (channel->isInviteOnly())
 		channel->addInvitedMember(*user);
-	// Send invite notification to user
+	
+	// Send invite notification to the invited user
+	std::string inviteMsg = ":" + client.getNick() + "!~" + client.getUserName() + "@localhost INVITE " + targetNick + " :" + channelName + "\r\n";
+	user->appendToSendBuffer(inviteMsg);
+	
+	// Confirm to the inviter
+	std::string confirmMsg = ":localhost 341 " + client.getNick() + " " + targetNick + " " + channelName + "\r\n";
+	client.appendToSendBuffer(confirmMsg);
 }
 
 void	Server::handleTopic(Client &client, const std::vector<std::string> &args)
 {
 	if (args.empty())
-		return; // 461 ERR_NEEDMOREPARAMS
+	{
+		std::string error = ":localhost 461 " + client.getNick() + " TOPIC :Not enough parameters\r\n";
+		client.appendToSendBuffer(error);
+		return;
+	}
 	
-	size_t	size = args.size();
-	Channel	*channel = getChannel(args[0]); 
+	std::string channelName = args[0];
+	Channel *channel = getChannel(channelName);
+	
 	if (!channel)
-		return; // 403 ERR_NOSUCHCHANNEL <channel> :No such channel
+	{
+		std::string error = ":localhost 403 " + client.getNick() + " " + channelName + " :No such channel\r\n";
+		client.appendToSendBuffer(error);
+		return;
+	}
+	
 	if (!channel->isMember(client))
-		return; // 442 ERR_NOTONCHANNEL <channel> :You're not on that channel
-	if (size >= 2)
+	{
+		std::string error = ":localhost 442 " + client.getNick() + " " + channelName + " :You're not on that channel\r\n";
+		client.appendToSendBuffer(error);
+		return;
+	}
+	
+	// Setting topic
+	if (args.size() >= 2)
 	{
 		if (channel->hasRestrictedTopic() && !channel->isOperator(client))
-			return; // 482 ERR_CHANOPRIVSNEEDED <channel> :You're not channel operator
-		channel->setTopic(args[1]); 
-		broadcastMsg(client, channel, ":alice!~alice@host TOPIC #school :Homework due Monday!"); // to do
-	} 
-	else if (size == 1)
+		{
+			std::string error = ":localhost 482 " + client.getNick() + " " + channelName + " :You're not channel operator\r\n";
+			client.appendToSendBuffer(error);
+			return;
+		}
+		
+		// Set the new topic
+		std::string newTopic = args[1];
+		channel->setTopic(newTopic);
+		
+		// Broadcast topic change to all channel members
+		std::string topicMsg = ":" + client.getNick() + "!~" + client.getUserName() + "@localhost TOPIC " + channelName + " :" + newTopic + "\r\n";
+		std::set<Client*>::iterator it = channel->getMembers().begin();
+		for (; it != channel->getMembers().end(); it++)
+			(*it)->appendToSendBuffer(topicMsg);
+	}
+	// Viewing topic
+	else
 	{
 		if (channel->getTopic().empty())
-			client.sendMsg(client, ":server.name 331 <nick> #channel :No topic is set"); //to do
+		{
+			std::string noTopicMsg = ":localhost 331 " + client.getNick() + " " + channelName + " :No topic is set\r\n";
+			client.appendToSendBuffer(noTopicMsg);
+		}
 		else
 		{
-			// Send topic to client
-			std::string topic_msg = ":server.name 332 " + client.getNick() + " " + args[0] + " :" + channel->getTopic() + "\r\n";
-			client.appendToSendBuffer(topic_msg);
+			std::string topicMsg = ":localhost 332 " + client.getNick() + " " + channelName + " :" + channel->getTopic() + "\r\n";
+			client.appendToSendBuffer(topicMsg);
 		}
 	}
 }
