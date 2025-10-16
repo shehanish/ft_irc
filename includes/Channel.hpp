@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/09 07:44:57 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/15 11:09:28 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,8 @@ class	Channel
 		~Channel();
 
 		void		addUser(Client &user);
-		void		addOperator(Client &user, bool setOp);
+		// void		addOperator(Client &user, bool setOp);
+		void		addOperator(Client &user);
 		void		delUser(Client &user);
 		void		delOperator(Client &user);
 		bool		isOperator(Client &user);
@@ -63,7 +64,8 @@ class	Channel
 		void		delInvitation(Client &client);
 		void		addInvitedMember(Client &client);
 		LimitMode	hasLimit();
-		void		setLimit(const int &limit, bool setLimit);
+		// void		setLimit(const int &limit, bool setLimit);
+		void		setLimit(int &newLimit);	
 		int			getLimit();
 		
 	private:

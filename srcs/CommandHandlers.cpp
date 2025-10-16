@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandlers.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 08:39:57 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/14 15:07:11 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/15 11:21:46 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -359,7 +359,7 @@ void	Server::handleTopic(Client &client, const std::vector<std::string> &args)
 	else if (size == 1)
 	{
 		if (channel->getTopic().empty())
-			client.sendMsg(client, ":server.name 331 <nick> #channel :No topic is set"); //to do
+			client.appendToSendBuffer(":server.name 331 <nick> #channel :No topic is set");
 		else
 		{
 			// Send topic to client

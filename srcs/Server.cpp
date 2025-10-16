@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/14 14:49:48 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/16 14:06:54 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,7 +184,9 @@ int Server::setUpSocket()
  */
 bool Server::parse(std::string &msg, Client *client)
 {
-    int len = msg.size();
+	s_data data;
+
+	int len = msg.size();
     if (len == 0)
         return true; // silently ignore empty messages
     else if (len > 512)
@@ -204,7 +206,7 @@ bool Server::parse(std::string &msg, Client *client)
         size_t space_pos = msg.find(' ');
         if (space_pos == std::string::npos)
             return false; // invalid
-        std::string prefix = msg.substr(1, space_pos - 1);
+        data.prefix = msg.substr(1, space_pos - 1);
         pos = space_pos + 1;
     }
 
@@ -257,11 +259,11 @@ bool Server::parse(std::string &msg, Client *client)
 	{
 		handleUser(*client, args);
 	}
-    else if (cmd == "CAP")
+	else if (cmd == "CAP")
     {
         handleCap(*client, args);
     }
-    else
+	else
     {
         // For all other commands, check if client is registered
         if (!client->isRegistered())
@@ -275,9 +277,6 @@ bool Server::parse(std::string &msg, Client *client)
         std::map<std::string, Command*>::iterator it = _commands.find(cmd);
         if (it != _commands.end())
         {
-            // Create s_data structure for command execution
-            s_data data;
-            data.prefix = "";
             data.args = args;
             it->second->execute(*this, *client, data);
         }
@@ -304,12 +303,12 @@ void Server::handleCap(Client &client, const std::vector<std::string> &args)
         // HexChat sends "CAP LS 302" so it might include version number in args[1]
         std::string reply = ":localhost CAP * LS :\r\n";
         client.appendToSendBuffer(reply);
-	// std::cout << "Handled CAP LS for client " << client.getFd() << std::endl;
+		// std::cout << "Handled CAP LS for client " << client.getFd() << std::endl;
     }
     else if (subCmd == "END")
     {
         // CAP negotiation ended, client is ready to proceed with registration
-	// std::cout << "Client " << client.getFd() << " ended CAP negotiation." << std::endl;
+		// std::cout << "Client " << client.getFd() << " ended CAP negotiation." << std::endl;
         // Try to complete registration in case PASS/NICK/USER were already sent
         registerClient(client);
     }
@@ -325,7 +324,7 @@ void Server::handleCap(Client &client, const std::vector<std::string> &args)
     else
     {
         // Ignore other CAP subcommands silently
-	// std::cout << "Ignoring CAP " << subCmd << " from client " << client.getFd() << std::endl;
+		// std::cout << "Ignoring CAP " << subCmd << " from client " << client.getFd() << std::endl;
     }
 }
 
@@ -388,14 +387,14 @@ void Server::loop()
 					fcntl(client_fd, F_SETFL, O_NONBLOCK); // make client socket non-blocking
 					std::cout << "New connection accepted!" << std::endl;
 
-					std::string welcome = "Welcome to our IRC server 🌎!\r\n"; // TODO remove this
-					send(client_fd, welcome.c_str(), welcome.length(), 0); // TODO remove this
 					pollfd newclient_pollfd = {client_fd, POLLIN | POLLOUT, 0};
 					poll_fds.push_back(newclient_pollfd);
 					// Cast to sockaddr_in to access sin_addr (choosing IPv4 here!)
 					struct sockaddr_in *addr_in = (struct sockaddr_in *)&client_addr;
 					std::string client_ip = inet_ntoa(addr_in->sin_addr);
 					_clients[client_fd] = new Client(client_fd, client_ip);
+					std::string welcome = "Welcome to our IRC server 🌎!\r\n"; // TODO remove this
+					_clients[client_fd]->appendToSendBuffer(welcome);
 				}
 				else // existing client sends message
 				{
@@ -423,7 +422,7 @@ void Server::loop()
 							}
 						}
 					}
-					else if (bytesnum == 0) // handles Ctrl-D signal
+					else if (bytesnum == 0)
 					{
 						std::cout << "Client " << poll_fds[i].fd << " hung up" << std::endl;
 						close(poll_fds[i].fd);

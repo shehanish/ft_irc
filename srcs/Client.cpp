@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:57:14 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/13 15:41:26 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/15 12:42:25 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,7 +168,7 @@ bool Client::flush()
 	if (_sendBuffer.empty())
 		return true;
 	
-	size_t sent = send(_fd, _sendBuffer.c_str(), _sendBuffer.size(), 0);
+	int sent = send(_fd, _sendBuffer.c_str(), _sendBuffer.size(), 0);
 	if (sent < 0)
 	{
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
