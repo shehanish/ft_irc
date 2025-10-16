@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/15 12:41:32 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/16 15:39:58 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,9 +85,6 @@ class Client
 		std::vector<std::string> receiveData(const char *data, size_t len);
 		bool flush();
 		void appendToSendBuffer(const std::string& data);
-		// void clearSendBuffer();
-		void queueMsg(const std::string &msg); 
-		void sendMsg(Client &client, const std::string &msg);
 
 		//Registration
 		bool    isRegistered() const { return _isRegistered; };

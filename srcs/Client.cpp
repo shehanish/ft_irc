@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:57:14 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/15 12:42:25 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/16 15:40:07 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,24 +189,6 @@ bool    Client::setRegistered(bool value)
 void Client::appendToSendBuffer(const std::string& data) 
 {
     _sendBuffer += data;
-}
-
-// with implemented buffer it would be a bad idea to clear out everything
-// void Client::clearSendBuffer() 
-// {
-//     _sendBuffer.clear();
-// }
-
-void Client::queueMsg(const std::string &msg) 
-{
-    _sendBuffer += msg + "\r\n";
-}
-
-void Client::sendMsg(Client &client, const std::string &msg)
-{
-	queueMsg(msg); // server manages the messages completely with flush
-	(void)client;
-    // ::send(client.getFd(), _sendBuffer.c_str(), _sendBuffer.size(), 0);
 }
 
 void Client::addUserChannel(Channel* channel) {

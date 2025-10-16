@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shkaruna <shkaruna@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/14 15:06:47 by shkaruna         ###   ########.fr       */
+/*   Updated: 2025/10/16 15:41:53 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,6 @@ class Server
 		void loop(); // main loop
 		bool parse(std::string &msg, Client *client);
 		void cleanup();
-		void broadcastMsg(Client &client, Channel *channel, const std::string &msg);
 };
 
 #endif

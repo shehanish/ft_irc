@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/16 14:06:54 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/16 15:41:42 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,7 +200,7 @@ bool Server::parse(std::string &msg, Client *client)
 
     size_t pos = 0;
 
-    // Extract prefix if present (optional)
+    // Extract prefix if present
     if (msg[0] == ':')
     {
         size_t space_pos = msg.find(' ');
@@ -451,13 +451,6 @@ void Server::loop()
 			}
 		}
 	}
-}
-
-void	Server::broadcastMsg(Client &source, Channel *channel, const std::string &msg)
-{
-	std::set<Client*>::iterator	sit = channel->getMembers().begin();
-	for (; sit != channel->getMembers().end(); sit++)
-		(*sit)->sendMsg(source, msg); // TODO send msg needs to be adapted to also send prefix 
 }
 
 void	Server::handlePass(Client &client, const std::vector<std::string> &args)

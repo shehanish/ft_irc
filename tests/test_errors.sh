@@ -29,7 +29,8 @@ test_command() {
     echo "-------------------------------------------"
     
     # Send commands and show response
-    (echo "$commands"; sleep 1) | nc $SERVER $PORT | head -20
+    printf "%s\r\n" "$commands" | nc -w 2 $SERVER $PORT | head -20
+    # (echo -e "$commands\r\n"; sleep 1) | nc $SERVER $PORT | head -20
     
     echo ""
     echo "Press Enter for next test..."
@@ -38,39 +39,34 @@ test_command() {
 
 # Test 1: Command before registration (ERR_NOTREGISTERED - 451)
 test_command \
-    "Command before registration" \
-    "JOIN #test" \
-    "451 - ERR_NOTREGISTERED"
+   "Command before registration" \
+   "JOIN #test" \
+   "451 - ERR_NOTREGISTERED"
 
 # Test 2: Wrong password (ERR_PASSWDMISMATCH - 464)
 test_command \
     "Wrong password" \
-    "PASS wrongpassword
-NICK testuser
-USER testuser 0 * :Test User" \
+    "PASS wrongpassword\r\nNICK testuser\r\nUSER testuser 0 * :Test User" \
     "464 - ERR_PASSWDMISMATCH"
 
 # Test 3: NICK without parameter (ERR_NONICKNAMEGIVEN - 431)
 test_command \
     "NICK without parameter" \
-    "PASS $PASSWORD
-NICK" \
+    "PASS $PASSWORD\r\nNICK" \
     "431 - ERR_NONICKNAMEGIVEN"
 
 # Test 4: Invalid nickname (ERR_ERRONEUSNICKNAME - 432)
 test_command \
     "Invalid nickname" \
-    "PASS $PASSWORD
-NICK #invalid
-USER testuser 0 * :Test User" \
+    "PASS $PASSWORD\r\nNICK #invalid\r\nUSER testuser 0 * :Test User" \
     "432 - ERR_ERRONEUSNICKNAME"
 
 # Test 5: JOIN without parameter (ERR_NEEDMOREPARAMS - 461)
 test_command \
     "JOIN without parameter" \
-    "PASS $PASSWORD
-NICK testuser5
-USER testuser5 0 * :Test User
+    "PASS $PASSWORD\r\n
+NICK testuser5\r\n
+USER testuser5 0 * :Test User\r\n
 JOIN" \
     "461 - ERR_NEEDMOREPARAMS"
 
@@ -78,8 +74,8 @@ JOIN" \
 test_command \
     "PRIVMSG without text" \
     "PASS $PASSWORD
-NICK testuser6
-USER testuser6 0 * :Test User
+NICK testuser6\r\n
+USER testuser6 0 * :Test User\r\n
 PRIVMSG #test" \
     "412 - ERR_NOTEXTTOSEND"
 
