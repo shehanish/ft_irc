@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/16 15:41:42 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/16 16:28:48 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -507,6 +507,14 @@ void	Server::handleNick(Client &client, const std::vector <std::string> &args)
 	if(isNickTaken(newNickname, &client))
 	{
 		std::string error = ":localhost 433 * " + newNickname + " :Nickname is already in use\r\n";
+		client.appendToSendBuffer(error);
+		return;
+	}
+	
+	if (newNickname[0] == '#')
+	{
+		
+		std::string error = ":localhost 432 * " + newNickname + " :Erroneous nickname\r\n";
 		client.appendToSendBuffer(error);
 		return;
 	}
