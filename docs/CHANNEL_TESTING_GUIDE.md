@@ -195,10 +195,10 @@ Everyone sees: `* Topic for #mychannel is: This is our test channel`
 
 **Charlie:**
 ```
-/part #mychannel See you later!
+/part #mychannel
 ```
 
-Alice and Bob see: `* charlie has left #mychannel (See you later!)`
+Alice and Bob see: `* charlie has left #mychannel`
 
 ---
 
@@ -317,15 +317,15 @@ Client registered: charlie!charlie
 
 ## Testing Checklist
 
-- [ ] All 3 clients can join the same channel
-- [ ] Messages sent in channel appear for everyone
-- [ ] Private messages work between clients
-- [ ] Topic can be set and seen by all
-- [ ] Users can leave channels (PART)
-- [ ] Channel creator can kick users
-- [ ] Invites work
-- [ ] Multiple channels can exist simultaneously
-- [ ] Users can be in multiple channels
+- [x] All 3 clients can join the same channel
+- [x] Messages sent in channel appear for everyone
+- [x] Private messages work between clients
+- [x] Topic can be set and seen by all
+- [x] Users can leave channels (PART)
+- [x] Channel creator can kick users
+- [x] Invites work
+- [x] Multiple channels can exist simultaneously
+- [x] Users can be in multiple channels
 
 ---
 

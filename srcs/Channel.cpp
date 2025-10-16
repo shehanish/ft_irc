@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/16 15:47:59 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/16 16:50:34 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,8 @@ void	Channel::addUser(Client &user)
 {
 	if (_limit.active && static_cast<size_t>(_limit.value) >= _members.size())
 	{
-		const std::string	msg = "Channel limit reached"; //check IRC docs
-		send(user.getFd(), msg.c_str(), msg.size(), 0);
+		std::string	error = ":localhost 471 " + user.getNick() + " " + this->_name + " :Cannot join channel (+l)\r\n";
+		user.appendToSendBuffer(error);
 		return;
 	}
 	_members.insert(&user);
