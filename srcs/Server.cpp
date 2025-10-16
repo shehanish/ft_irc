@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/16 16:28:48 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/16 16:37:04 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -457,7 +457,12 @@ void	Server::handlePass(Client &client, const std::vector<std::string> &args)
 {
 	// If already authenticated, ignore subsequent PASS commands
 	if (client.isAuthenticated())
-		return;
+	{
+		// 462 - ERR_ALREADYREGISTERED;
+		std::string error = ":localhost 462 * :You may not reregister\r\n";
+		client.appendToSendBuffer(error);
+		return;	
+	}
 	
 	if(args.empty())
 	{
