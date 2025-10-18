@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 08:39:57 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/11 08:53:50 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/18 08:20:39 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,7 @@ void	Server::handleTopic(Client &client, const std::vector<std::string> &args)
 	broadcastMsg(client, channel, ":alice!~alice@host TOPIC #school :Homework due Monday!"); // to do
 }
 
-/* static std::vector<std::string>	getModeParams(const std::vector<std::string> &args)
+static std::vector<std::string>	getModeParams(const std::vector<std::string> &args)
 {
 	std::vector<std::string>	params;
 	for (size_t i = 1; i < args.size(); i++)
@@ -248,7 +248,7 @@ void	Server::handleMode(Client &client, const std::vector<std::string> &args)
 				case 'l':
 					if (adding && indexParams < params.size())
 					{
-						channel->setLimit(atoi(params[indexParams++].c_str()));
+						channel->setLimit(atoi(params[indexParams++].c_str()), adding);
 					}
 					else
 						channel->setLimit(0, adding);
