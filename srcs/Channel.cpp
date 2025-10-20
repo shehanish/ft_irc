@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/16 16:50:34 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/20 06:39:14 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,7 +191,10 @@ Channel::LimitMode	Channel::hasLimit()
 
 void	Channel::setLimit(int &newLimit)
 {
-	_limit.active = true;
+	if (newLimit == 0)
+		_limit.active = false;
+	else
+		_limit.active = true;
 	_limit.value = newLimit;	
 }
 
