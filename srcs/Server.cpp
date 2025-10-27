@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/27 15:17:21 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/27 15:37:26 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -457,22 +457,24 @@ void	Server::removeFromChannels(int client_fd)
     Client* client = _clients[client_fd];
 
     // Iterate over all channels
-    std::map<std::string, Channel*>::iterator ch_it = _channels.begin();
-    while (ch_it != _channels.end())
-    {
+    std::string quitMsg = ":" + client->getNick() + "!" + client->getUserName() + "@host QUIT :Client disconnected\r\n";
+	for (std::map<std::string, Channel*>::iterator ch_it = _channels.begin(); ch_it != _channels.end(); ++ch_it)    
+	{
         Channel* channel = ch_it->second;
-		std::cout << "Client will be removed from: " << ch_it->second->getTopic() << std::endl;
         // Remove client from channel
         channel->delUser(*client);
 
         // Broadcast quit message to remaining members
-        std::string quitMsg = ":" + client->getNick() + "!" + client->getUserName() + "@host QUIT :Client disconnected\r\n";
 		std::set<Client*>::iterator it = channel->getMembers().begin();
 		for (; it != channel->getMembers().end(); it++)
 		{
 			(*it)->appendToSendBuffer(quitMsg);
 		}
-		++ch_it;
+		if (channel->empty())
+    	{
+        	delete channel;
+        	_channels.erase(ch_it++);
+    	}
     }
 }
 

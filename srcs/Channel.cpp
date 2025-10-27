@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/09 21:01:19 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/20 06:39:14 by spitul           ###   ########.fr       */
+/*   Updated: 2025/10/27 15:32:46 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,11 @@ bool	Channel::checkKey(const std::string &pw)
 bool	Channel::isInviteOnly()
 {
 	return _invite.active;
+}
+
+bool Channel::empty() const
+{
+    return _members.empty();
 }
 
 void	Channel::setInviteOnly(bool enableInvite)

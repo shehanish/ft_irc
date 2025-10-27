@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:13:00 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/15 11:09:28 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/27 15:32:36 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ class	Channel
 		// void		setLimit(const int &limit, bool setLimit);
 		void		setLimit(int &newLimit);	
 		int			getLimit();
+		bool		empty() const;
 		
 	private:
 	
