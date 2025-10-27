@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:57:14 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/16 15:40:07 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/27 14:12:03 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,32 +35,31 @@ Client::Client(int fd, const std::string& ip)
 		_nb_chan(0),
 		_channels()	{};
 
-// maybe it is too tricky to add a copying possibility? two similar fd's might be a problem
-// Client::Client(const Client& oth) 
-// 		:_fd(oth._fd),
-// 		_ipAddress(oth._ipAddress),
-// 		_nick(oth._nick),
-// 		_username(oth._username),
-// 		_realname(oth._realname),
-// 		_recvBuffer(oth._recvBuffer),
-// 		_sendBuffer(oth._sendBuffer),
-// 		_isAuthenticated(oth._isAuthenticated) {};
+Client::Client(const Client& oth) 
+		:_fd(oth._fd),
+		_ipAddress(oth._ipAddress),
+		_nick(oth._nick),
+		_username(oth._username),
+		_realname(oth._realname),
+		_recvBuffer(oth._recvBuffer),
+		_sendBuffer(oth._sendBuffer),
+		_isAuthenticated(oth._isAuthenticated) {};
 
-// Client&	Client::operator=(const Client& oth) 
-// {
-// 	if(this != &oth)
-// 	{
-// 		_fd = oth._fd;
-// 		_ipAddress = oth._ipAddress;
-// 		_nick = oth._nick;
-// 		_username = oth._username;
-// 		_realname = oth._realname;
-// 		_recvBuffer = oth._recvBuffer;
-// 		_sendBuffer = oth._sendBuffer;
-// 		_isAuthenticated = oth._isAuthenticated;
-// 	}
-// 	return *this;
-// }
+Client&	Client::operator=(const Client& oth) 
+{
+	if(this != &oth)
+	{
+		_fd = oth._fd;
+		_ipAddress = oth._ipAddress;
+		_nick = oth._nick;
+		_username = oth._username;
+		_realname = oth._realname;
+		_recvBuffer = oth._recvBuffer;
+		_sendBuffer = oth._sendBuffer;
+		_isAuthenticated = oth._isAuthenticated;
+	}
+	return *this;
+}
 
 // Getters 
 
@@ -199,7 +198,7 @@ void Client::addUserChannel(Channel* channel) {
 // Remove a channel from the client's set
 void Client::delUserChannel(Channel* channel) {
     if (!channel) return;
-    _channels.erase(channel);  // safe even if channel is not in the set
+    _channels.erase(channel);  // save even if channel is not in the set
 }
 
 // Return the number of channels this client is in

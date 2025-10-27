@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:25:25 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/16 15:41:53 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/27 14:28:56 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ class Server
 		void	registerClient(Client &client);
 		Channel	*createChannel(const std::string &channel, Client &creator);
 		void 	sendWelcome(Client &client);
+		void	removeFromChannels(int client_fd);
 		
 		// MEMBER FUNCTIONS
 		

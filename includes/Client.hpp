@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:56:28 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/16 15:39:58 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/27 12:06:27 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,12 +45,13 @@ class Client
 		int 				_nb_chan;
 		std::set<Channel *> _channels;
 
+		Client(const Client& oth);
+		Client& operator=(const Client& oth);
+
 	public:
 		// Constructors & Destructor
 		Client();
 		Client(int fd, const std::string& ip);
-		Client(const Client& oth);
-		Client& operator=(const Client& oth);
 		~Client();
 
 		// Getters

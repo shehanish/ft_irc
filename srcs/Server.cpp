@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/16 16:43:05 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/27 15:17:21 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,9 +168,6 @@ int Server::setUpSocket()
 	return (0);
 }
 
-// use nc for testing
-// example: echo -e "PASS mysecret\r\nNICK anna\r\nUSER anna 0 * :Anna Example\r\n" | nc localhost 6667
-
 /**
  * @brief Parses the extracted message into the components <prefix>, <command> and list of parameters (<params>)..
  *
@@ -248,7 +245,6 @@ bool Server::parse(std::string &msg, Client *client)
 
 	if (cmd == "PASS")
 	{
-		// std::cout << "Check Pass" << std::endl;
 		handlePass(*client, args);
 	}
 	else if (cmd == "NICK")
@@ -393,7 +389,7 @@ void Server::loop()
 					struct sockaddr_in *addr_in = (struct sockaddr_in *)&client_addr;
 					std::string client_ip = inet_ntoa(addr_in->sin_addr);
 					_clients[client_fd] = new Client(client_fd, client_ip);
-					std::string welcome = "Welcome to our IRC server 🌎!\r\n"; // TODO remove this
+					std::string welcome = "Welcome to our IRC server 🌎!\r\n";
 					_clients[client_fd]->appendToSendBuffer(welcome);
 				}
 				else // existing client sends message
@@ -425,17 +421,19 @@ void Server::loop()
 					else if (bytesnum == 0)
 					{
 						std::cout << "Client " << poll_fds[i].fd << " hung up" << std::endl;
-						close(poll_fds[i].fd);
+						removeFromChannels(poll_fds[i].fd);
 						_clients.erase(poll_fds[i].fd);
 						poll_fds.erase(poll_fds.begin() + i);
+						close(poll_fds[i].fd);
 						i--;
 					}
 					else 
 					{
 						std::cerr << "Error: " << std::strerror(errno) << std::endl;
-						close(poll_fds[i].fd);
+						removeFromChannels(poll_fds[i].fd);
 						_clients.erase(poll_fds[i].fd);
 						poll_fds.erase(poll_fds.begin() + i);
+						close(poll_fds[i].fd);
 						i--;
 					}
 				}
@@ -451,6 +449,31 @@ void Server::loop()
 			}
 		}
 	}
+}
+
+void	Server::removeFromChannels(int client_fd)
+{
+    // Get client object
+    Client* client = _clients[client_fd];
+
+    // Iterate over all channels
+    std::map<std::string, Channel*>::iterator ch_it = _channels.begin();
+    while (ch_it != _channels.end())
+    {
+        Channel* channel = ch_it->second;
+		std::cout << "Client will be removed from: " << ch_it->second->getTopic() << std::endl;
+        // Remove client from channel
+        channel->delUser(*client);
+
+        // Broadcast quit message to remaining members
+        std::string quitMsg = ":" + client->getNick() + "!" + client->getUserName() + "@host QUIT :Client disconnected\r\n";
+		std::set<Client*>::iterator it = channel->getMembers().begin();
+		for (; it != channel->getMembers().end(); it++)
+		{
+			(*it)->appendToSendBuffer(quitMsg);
+		}
+		++ch_it;
+    }
 }
 
 void	Server::handlePass(Client &client, const std::vector<std::string> &args)
@@ -619,14 +642,4 @@ void Server::handleUser(Client &client, const std::vector<std::string> &args)
     // This will silently fail if PASS hasn't been sent yet
     registerClient(client);
 }
-
-/*
-PASS must succeed → client.setIsAuthenticated(true).
-
-NICK must succeed → client.setNick(nickname).
-
-USER must succeed → client.setUserName(...), client.setRealName(...).
-
-After each of NICK or USER, call registerClient(client).
-*/
 
