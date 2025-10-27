@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/27 15:37:26 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/27 15:51:40 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -470,11 +470,6 @@ void	Server::removeFromChannels(int client_fd)
 		{
 			(*it)->appendToSendBuffer(quitMsg);
 		}
-		if (channel->empty())
-    	{
-        	delete channel;
-        	_channels.erase(ch_it++);
-    	}
     }
 }
 
