@@ -6,10 +6,11 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 15:30:19 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/06 18:20:23 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/28 17:43:36 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <exception>
 #include <iostream>
 #include <csignal>
 #include <cstdlib>
@@ -32,31 +33,25 @@ int main (int argc, char** argv)
         std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
         return (1);
     }
-    Server server(argv[1], argv[2]);
-    signal(SIGINT, signalhandler);
-    signal(SIGTERM, signalhandler);
-    server.loop();
+    // Validate port: must be a whole number between 1 and 65535
+    char *endptr = NULL;
+    errno = 0;
+    long port = strtol(argv[1], &endptr, 10);
+    if (errno != 0 || endptr == argv[1] || *endptr != '\0' || port < 1 || port > 65535)
+    {
+        std::cerr << "Error: invalid port '" << argv[1] << "'. Port must be a number between 1 and 65535." << std::endl;
+        return 1;
+    }
+    try
+    {
+        Server server(argv[1], argv[2]);
+        signal(SIGINT, signalhandler);
+        signal(SIGTERM, signalhandler);
+        server.loop();
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
     return (0);
-    
-    // Client client(42, "127.0.0.1");
-    
-    // client.setNick("Shehani");
-    // client.setUserName("Shehani123");
-    // client.setRealName("Shehai Karunathilake");
-    // client.setRecvBuffer("Incomin data..");
-    // client.setSendBuffer("Outgoing data..");
-
-    // std::cout << "fd " << client.getFd() <<std::endl;
-    // std::cout << "Nick " << client.getNick() << std::endl;
-    // std::cout << "User Name " << client.getUserName() << std::endl;
-    // std::cout << "Real Name " << client.getRealName() << std::endl;
-    // std::cout << "RecvBuffer " << client.getRecvBuffer() << std::endl;
-    // std::cout << "SendBuffer " << client.getSendBuffer() << std::endl;
-    
-    
-    // std::cout << "Client created!" << std::endl;
-    // client.setNick("NewNick");
-    // std::cout << "Updated Nick: " << client.getNick() << std::endl;
-
-    // return (0);
 }
