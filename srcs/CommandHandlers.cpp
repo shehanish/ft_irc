@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CommandHandlers.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 08:39:57 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/28 16:20:16 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/28 16:33:04 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -232,7 +232,8 @@ void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
 		}
 		else
 		{
-			// Private message to user
+			// Private message to usermake
+			
 			Client *targetClient = getUser(target);
 			if (targetClient == NULL || !targetClient->isRegistered())
 			{
@@ -329,7 +330,7 @@ void	Server::handleInvite(Client &client, const std::vector<std::string> &args)
 	std::string channelName = args[1];
 	
 	Client *user = getUser(targetNick);
-	if (!user)
+	if (!user || !user->isRegistered())
 	{
 		std::string error = ":localhost 401 " + client.getNick() + " " + targetNick + " :No such nick/channel\r\n";
 		client.appendToSendBuffer(error);
