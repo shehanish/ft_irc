@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 08:39:57 by spitul            #+#    #+#             */
-/*   Updated: 2025/10/16 14:10:02 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/28 16:20:16 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,7 +234,7 @@ void	Server::handlePrivMsg(Client &client, const std::vector<std::string> &args)
 		{
 			// Private message to user
 			Client *targetClient = getUser(target);
-			if (targetClient == NULL)
+			if (targetClient == NULL || !targetClient->isRegistered())
 			{
 				std::string error = ":localhost 401 " + client.getNick() + " " + target + " :No such nick/channel\r\n";
 				client.appendToSendBuffer(error);

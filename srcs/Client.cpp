@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 16:57:14 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/27 14:12:03 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/28 15:36:44 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,7 @@ Client::Client()
 				_sendBuffer(), _isAuthenticated(false), _isRegistered(false),
 				_nb_chan(0), _channels() {};
 
-Client::~Client()
-	{
-		// std::cout << "Client has destroyed" << std::endl;
-	}
+Client::~Client() {}
 
 Client::Client(int fd, const std::string& ip) 
 		: _fd(fd), 

@@ -6,7 +6,7 @@
 /*   By: lde-taey <lde-taey@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:33:31 by lde-taey          #+#    #+#             */
-/*   Updated: 2025/10/27 15:51:40 by lde-taey         ###   ########.fr       */
+/*   Updated: 2025/10/28 16:05:40 by lde-taey         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -422,18 +422,20 @@ void Server::loop()
 					{
 						std::cout << "Client " << poll_fds[i].fd << " hung up" << std::endl;
 						removeFromChannels(poll_fds[i].fd);
+						close(poll_fds[i].fd);
+						delete _clients[poll_fds[i].fd];
 						_clients.erase(poll_fds[i].fd);
 						poll_fds.erase(poll_fds.begin() + i);
-						close(poll_fds[i].fd);
 						i--;
 					}
 					else 
 					{
 						std::cerr << "Error: " << std::strerror(errno) << std::endl;
 						removeFromChannels(poll_fds[i].fd);
+						close(poll_fds[i].fd);
+						delete _clients[poll_fds[i].fd];
 						_clients.erase(poll_fds[i].fd);
 						poll_fds.erase(poll_fds.begin() + i);
-						close(poll_fds[i].fd);
 						i--;
 					}
 				}
